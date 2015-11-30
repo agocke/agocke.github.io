@@ -1,5 +1,61 @@
-<<<<<<< HEAD
- body{background-image:url('/images/lightpaperfibers.png');background-repeat:repeat}header{width:525px;margin:auto;padding-bottom:1em;background-repeat:no-repeat}#hlogo{width:450px;height:50px;overflow:hidden;margin:auto;margin-top:0px;margin-bottom:0px;padding:0px}#separator{background-image:url('/images/separator.png');height:30px;width:400px;margin:auto}header #hlogo a{width:450px;height:50px;background-position:0px 0px;background-image:url('/images/header-bkgnd3.png');background-repeat:no-repeat;display:block}nav{width:525px;margin:auto;margin-top:0px;margin-bottom:0px;padding:0px;font-family:'Raleway', sans-serif;font-size:1.4em;text-align:center}nav ol{padding:0px;margin:0px}nav a{text-decoration:none;color:black}nav li{display:inline;margin-left:10px;margin-right:10px}#welcome{width:500px;margin:auto;margin-top:33px;text-align:center;color:#333333;font-size:2em}
-=======
- body{background-image:url('/images/lightpaperfibers.png');background-repeat:repeat}header{width:525px;margin:auto;padding-bottom:1em;background-repeat:no-repeat}#hlogo{width:450px;height:50px;overflow:hidden;margin:auto;margin-top:0px;margin-bottom:0px;padding:0px}#separator{background-image:url('/images/separator.png');background-repeat:no-repeat;height:30px;width:400px;margin:auto}header #hlogo a{width:450px;height:50px;background-position:0px 0px;background-image:url('/images/header-bkgnd3.png');background-repeat:no-repeat;display:block}nav{width:525px;margin:auto;margin-top:10px;margin-bottom:20px;padding:0px;font-family:'Raleway', sans-serif;font-size:1.4em;text-align:center}nav ol{padding:0px;margin:0px}nav a{text-decoration:none;color:black}nav li{display:inline;margin-left:10px;margin-right:10px}#welcome{width:500px;margin:auto;margin-top:33px;text-align:center;color:#333333;font-size:1.2em}
->>>>>>> b9f35d78408701953e159af72b13b0e32bfe8d21
+body {
+    background-image:url('/images/lightpaperfibers.png');
+    background-repeat:repeat;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+}
+
+#box {
+    background-color: #FFFFFF;
+    width: 1000px;
+    margin: auto;
+}
+
+header {
+    padding-bottom:1em;
+}
+
+aside {
+    width: 275px;
+    height: 100%;
+    float: left;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-family:'Raleway', sans-serif;
+    display: inline-table;
+}
+
+aside #title a {
+    font-size: 2.1em;
+    font-style: italic;
+    font-family: 'Cambay', sans-serif;
+    text-decoration:none;
+    color: black;
+}
+
+aside #details {
+    padding-left: 10px;
+    padding-right: 15px;
+    font-size: 0.9em;
+}
+
+aside ol {
+    padding:0px;
+    margin:0px
+}
+
+aside li{
+    display:inline;
+    margin-left:10px;
+    margin-right:10px
+}
+
+main {
+    overflow: auto;
+    margin: 30px 30px;
+    color:#333333;
+    font-size:1.2em;
+    display: inline-block;
+    width: auto;
+}
