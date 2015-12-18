@@ -4,13 +4,15 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Andy Gocke'
 SITENAME = u'comment out'
-SITEURL = ''
+SITEURL = 'http://commentout.com'
 
 PATH = 'content'
 
 TIMEZONE = 'America/Los_Angeles'
 
 DEFAULT_LANG = u'en'
+
+THEME = 'themes/commentout'
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
