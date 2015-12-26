@@ -2,13 +2,33 @@
 <html lang="en">
     <head>
         {% block head %}
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{% endblock title %}</title>
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="/theme/css/style.css" />
-        {% endblock %}
+        <script src="https://use.typekit.net/gsq3dwo.js"></script>
+        <script>try{Typekit.load({ async: true });}catch(e){}</script>
+        {% endblock head %}
     </head>
     <body>
-        {% block body %}
-        {% endblock %}
+        <div id="box">
+            {% block body %}
+            <header>
+                <img src="/theme/images/mountain.jpg" width="100%"> 
+            </header>
+            <nav>
+                <div id="home"># comment out</div>
+                <ul>
+                    <li>Blog</li>
+                    <li>About</li>
+                </ul>
+            </nav>
+            <main>
+                {% block content %}
+                {% endblock content %}
+            </main>
+            <footer>
+            </footer>
+            {% endblock body %}
+        </div>
     </body>
 </html>

@@ -1,5 +1,5 @@
 body {
-    background-image:url('/images/lightpaperfibers.png');
+    background-image:url('/theme/images/lightpaperfibers.png');
     background-repeat:repeat;
     margin: 0px;
     padding: 0px;
@@ -7,55 +7,99 @@ body {
 }
 
 #box {
-    background-color: #FFFFFF;
+    background-color: #FDFDFD;
     width: 1000px;
     margin: auto;
 }
 
-header {
-    padding-bottom:1em;
+nav {
+    width: 80%;
+    margin: auto;
+    margin-top: 10px;
+    height: 40px;
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
 }
 
-aside {
-    width: 275px;
-    height: 100%;
-    float: left;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-family:'Raleway', sans-serif;
-    display: inline-table;
-}
-
-aside #title a {
-    font-size: 2.1em;
+nav #home {
+    font-family: 'ubuntu-mono', monospace;
+    font-size: 1.3em;
     font-style: italic;
-    font-family: 'Cambay', sans-serif;
-    text-decoration:none;
-    color: black;
+    float: left;
+    line-height: 40px;
+    height: 40px;
+    display: inline-block;
+    color: #5D5D5D;
 }
 
-aside #details {
-    padding-left: 10px;
-    padding-right: 15px;
+nav ul {
     font-size: 0.9em;
+    padding: 0px;
+    margin: 0px;
+    height: 40px;
+    float: right;
+    color: #33444E;
 }
 
-aside ol {
-    padding:0px;
-    margin:0px
-}
-
-aside li{
-    display:inline;
-    margin-left:10px;
-    margin-right:10px
+nav li {
+    font-family: 'Raleway', sans-serif;
+    display: inline-block;
+    margin-right: 20px;
+    line-height: 40px;
+    height: 40px;
+    vertical-align: baseline;
 }
 
 main {
-    overflow: auto;
-    margin: 30px 30px;
-    color:#333333;
+    margin: 10px 30px;
+    color: #0C1408;
     font-size:1.2em;
-    display: inline-block;
-    width: auto;
+    font-family: 'Baskerville', 'Baskerville Old Face', 'Palatino', 'Palatino Linotype', serif;
+    text-align: center;
+}
+
+main h1 {
+    font-size: 1.5em;
+    font-weight: normal;
+    clear: both;
+}
+
+main h2 {
+    font-weight: normal;
+    font-size: 1.2em;
+    display: block;
+    margin: 10px;
+}
+
+main ol {
+    padding: 0px;
+    margin-top: 50px;
+}
+
+main ol::after {
+    content: after;
+    display: block;
+    clear: both;
+}
+
+main li {
+    width: 50%;
+    height: 150px;
+    margin: 0px;
+    float: left;
+    text-align: center;
+    list-style: none;
+}
+
+h3 {
+    font-style: italic;
+    font-size: 1.0em;
+    font-weight: normal;
+    margin: 0px;
+}
+
+footer {
+    clear: both;
 }
