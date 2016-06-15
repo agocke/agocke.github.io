@@ -3,7 +3,11 @@ body {
     background-repeat:repeat;
     margin: 0px;
     padding: 0px;
-    overflow: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
 }
 
 #box {
@@ -13,7 +17,7 @@ body {
 }
 
 nav {
-    width: 80%;
+    width: 90%;
     margin: auto;
     margin-top: 10px;
     height: 40px;
@@ -27,7 +31,6 @@ nav #home {
     font-family: 'ubuntu-mono', monospace;
     font-size: 1.3em;
     font-style: italic;
-    float: left;
     line-height: 40px;
     height: 40px;
     display: inline-block;
@@ -41,6 +44,7 @@ nav ul {
     height: 40px;
     float: right;
     color: #33444E;
+    font-style: italic;
 }
 
 nav li {
@@ -53,51 +57,52 @@ nav li {
 }
 
 main {
-    margin: 10px 30px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
     color: #0C1408;
     font-size:1.2em;
     font-family: 'Baskerville', 'Baskerville Old Face', 'Palatino', 'Palatino Linotype', serif;
     text-align: center;
 }
 
+main code {
+    background-color: #eff0f1;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    border-radius: 0.2em;
+}
+
+main pre {
+    background-color: #eff0f1;
+    padding: 0.7em 1.0em;
+    border-radius: 0.5em;
+}
+
 main h1 {
-    font-size: 1.5em;
+    font-size: 1.35em;
     font-weight: normal;
     clear: both;
+    text-decoration: underline;
 }
 
-main h2 {
+main .article-content {
+    text-align: left;
+}
+
+main .article-content a {
+    color: #07C;
+}
+
+main .article-content a:hover {
+    text-decoration: underline;
+}
+
+main .article-content h2 {
+    text-decoration: underline;
     font-weight: normal;
-    font-size: 1.2em;
-    display: block;
-    margin: 10px;
-}
-
-main ol {
-    padding: 0px;
-    margin-top: 50px;
-}
-
-main ol::after {
-    content: after;
-    display: block;
-    clear: both;
-}
-
-main li {
-    width: 50%;
-    height: 150px;
-    margin: 0px;
-    float: left;
-    text-align: center;
-    list-style: none;
-}
-
-h3 {
-    font-style: italic;
-    font-size: 1.0em;
-    font-weight: normal;
-    margin: 0px;
 }
 
 footer {

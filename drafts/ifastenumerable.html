@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Time to Pay the Piper | commentout.net</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="/theme/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="/theme/css/pygment.css" />
+        <script src="https://use.typekit.net/gsq3dwo.js"></script>
+        <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    </head>
+    <body>
+        <div id="box">
+            <header>
+                <img src="/theme/images/top_img.jpg" width="100%"> 
+            </header>
+            <nav>
+                <a href="http://commentout.com"><div id="home"># comment out</div></a>
+                <ul>
+                    <a href="http://commentout.com"><li>Blog</li></a>
+                    <a href="/about.html"><li>About</li></a>
+                </ul>
+            </nav>
+            <main>
+
+<section id="content" class="body">
+    <h1>Time to Pay the Piper</h1>
+    <h2></h2>
+
+    <div class="article-content">
+        <p>As many users of C# know, one of the most common reasons developers prefer
+C# to languages like C and C++ is increased expressivity. Over the past few
+releases the language and compiler team have tried to provide even more
+expressivity through features like <code>dynamic</code> and LINQ. Unfortunately, such
+features have not been "free." <code>dynamic</code> especially incurred significant run
+time overhead for its use.</p>
+<p>Recently, the compiler and language teams have been taking a closer look at
+these tradeoffs and considering a number of language features to help buy back
+some of that bare-metal speed. Some examples include ref-locals, 
+ref-returns, and "replaceable" <code>Task&lt;T&gt;</code> for async, all of which make it easier
+to avoid allocating memory, a very common cause for performance issues in
+managed code.  We're calling this strategy "pay-for-play." The idea is that you
+should be able to progressively buy into language features. Only using the
+simple aspects of features shouldn't necessitate a heavy performance penalty.</p>
+<p>Unfortunately, one of the most heavily used and praised features in C# is one
+with a pretty bad pay/play ratio: LINQ. LINQ is loved because it can turn
+a multiline foreach and if statement into a quick <code>array.Where</code>, but it also
+turns out that that short statement can be as much as an order of magnitude
+worse in performance than the prolix foreach.</p>
+<p>So, what can we do to "fix" LINQ? The first place to start is probably
+<code>IEnumerable&lt;T&gt;</code>&mdash;the glue interface that holds all of LINQ together. Of
+course, I'm not the only one to try taking on IEnumerable&lt;T&gt;. Jared Parsons,
+my lead (whose solution is obviously the best), wrote <a href="http://blog.paranoidcoding.com/2014/08/19/rethinking-enumerable.html">this
+article</a>
+on how to change IEnumerable&lt;T&gt; to a more optimization-friendly structure.
+Jared's design was, however, lacking one very important thing: an
+implementation. I decided to give implementing IFastEnumerable&lt;T&gt; a shot.
+While I believed that Jared's design is very fast, I also have to admit that I
+hate passing around the extra type parameter, so I've also tried implementing
+my own design with only a single type parameter.</p>
+<p>Without further ado, let's take a look at some benchmarks:</p>
+<div class="highlight"><pre><span></span>// * Summary *
+BenchmarkDotNet=v0.9.7.0
+OS=OSX
+Processor=?, ProcessorCount=8
+Frequency=1000000000 ticks, Resolution=1.0000 ns, Timer=UNKNOWN
+HostCLR=CORE, Arch=64-bit RELEASE [RyuJIT]
+JitModules=?
+1.0.0-preview1-002702
+Type=Program  Mode=Throughput  Toolchain=Core  
+                 Method |        Median |     StdDev |
+----------------------- |-------------- |----------- |
+                ForLoop |   276.3182 us | 14.0787 us |
+            ForEachLoop |   604.3452 us | 16.3732 us |
+     ForeachIEnumerable | 1,677.7799 us | 56.6016 us |
+         FastEnumerable |   248.7717 us |  6.2044 us |
+   MyListFastEnumerable |   304.5593 us | 16.9211 us |
+        IFastEnumerable | 1,012.0536 us | 62.9473 us |
+ IFastEnumerableGeneric |   250.7948 us |  6.8619 us |
+         FastEnumerator |   260.7068 us | 12.6347 us |
+   MyListFastEnumerator |   182.6534 us |  2.5559 us |
+        IFastEnumerator |   978.0919 us | 16.6613 us |
+ IFastEnumeratorGeneric |   452.1760 us | 16.3232 us |
+// ***** BenchmarkRunner: End *****
+</pre></div>
+
+
+<p>These numbers come from the repository at
+<a href="https://github.com/agocke/fast-enumerable">https://github.com/agocke/fast-enumerable</a>.
+I examined <code>IEnumerable&lt;T&gt;</code> and two possible alternative implementations. The
+first alternative is Jared's with a few minor tweaks, while the second is my
+own, with the constraint of only using a single type parameter.</p>
+<h2>IEnumerable&lt;T&gt;</h2>
+<p>Let's first look at IEnumerable&lt;T&gt;. <code>ForLoop</code>, <code>ForEachLoop</code>, and
+<code>ForeachIEnumerable</code> are all based around enumerating the existing <code>List&lt;T&gt;</code>
+type in various ways. <code>ForLoop</code> enumerates <code>List&lt;T&gt;</code> using a class index-based
+for loop, <code>ForEachLoop</code> enumerates using a standard <code>foreach</code> loop, and 
+<code>ForeachIEnumerable</code> enumerates using <code>foreach</code> over the <code>List&lt;T&gt;</code> cast down
+to <code>IEnumerable&lt;T&gt;</code>. It turns out that my intuition was correct for these
+measurements, so I'll take a brief moment to explain how I ballparked a few
+measurements.</p>
+<p>First, here are some basic primitives, roughly ordered by expected cost:</p>
+<ol>
+<li>Register access</li>
+<li>Integer arithmetic operation in register</li>
+<li>L1 cache hit</li>
+<li>Function call</li>
+<li>L1 cache miss</li>
+</ol>
+<p>So let's look at <code>ForLoop</code>. This is a simple for-loop over a <code>List&lt;T&gt;</code> field.
+There's not much here, just an integer counter, a bounds check, an element
+access, and an add to a 64-bit accumulator. So what would optimal code look
+like to me? Probably something like (in asm-pseudocode):</p>
+<div class="highlight"><pre><span></span><span class="nf">xor</span> <span class="o">%</span><span class="nb">rax</span><span class="p">,</span> <span class="o">%</span><span class="nb">rax</span>
+<span class="nf">xor</span> <span class="o">%</span><span class="nb">rcx</span><span class="p">,</span> <span class="o">%</span><span class="nb">rcx</span>
+<span class="nf">mov</span> <span class="o">%</span><span class="nb">rbx</span><span class="p">,</span> <span class="p">[</span><span class="nv">list.Length</span><span class="p">]</span>
+<span class="nl">loop:</span>
+<span class="nf">cmp</span> <span class="o">%</span><span class="nb">rcx</span><span class="p">,</span> <span class="o">%</span><span class="nb">rbx</span>
+<span class="nf">jge</span> <span class="nv">done</span>
+<span class="nf">add</span> <span class="o">%</span><span class="nb">rax</span><span class="p">,</span> <span class="p">[</span><span class="nv">list</span> <span class="o">+</span> <span class="o">%</span><span class="nb">rcx</span><span class="p">]</span>
+<span class="nf">add</span> <span class="o">%</span><span class="nb">rcx</span><span class="p">,</span> <span class="mi">1</span>
+<span class="nf">jmp</span> <span class="nv">loop</span>
+<span class="nl">done:</span>
+<span class="nf">ret</span>
+</pre></div>
+
+
+<p>So what's the probability that this is the code that actually gets generated?
+Pretty low, actually. There are a number of assumptions I made that aren't easy
+for a compiler to make. While it looks like the iteration over the <code>List</code> is
+simple, there are a number of indirect calls in the iteration.  First,
+<code>list.Length</code> and <code>list[i]</code> are not simple fields, they're properties.  The
+CLR, however, is very good at recognizing these simple properties and inlining
+their bodies. But even with inlining, it's not easy to recognize that
+<code>list.Length</code> is a constant&mdash;the CLR needs to prove that both 1) the loop
+body makes no modifications to the length of the array and 2) no other threads
+do either. (2) is the tricky part. Without that optimization, we have to issue
+a load (hopefully in L1) for every iteration. Similarly, unless we can
+prove that the index is less than the array length at every load, we also
+have to issue an extra bounds check, possibly two (one for <code>List&lt;int&gt;</code> and one
+for <code>int[]</code>).  Despite the complexity, the CLR actually is often good enough to
+make these optimizations, especially if the instance of the <code>List&lt;int&gt;</code> is
+method-local, making threading and alias analysis much easier.  Regardless, we
+can look at this as close to the pinnacle of codegen.</p>
+<p>So what about <code>ForeachLoop</code>? It doesn't look good at first, but <code>List&lt;T&gt;</code>
+actually takes advantage of a little-known optimization available for <code>foreach</code>
+included in C#. When running on IEnumerable, <code>foreach</code> usually invokes
+<code>IEnumerable&lt;T&gt;.GetEnumerator()</code> but, if available, <code>foreach</code> will instead use
+the enumerator returned by a <code>Enumerator</code> property, as long as the enumerator
+type structurally matches the <code>IEnumerator</code> pattern. Aside from saving the
+IEnumerable&lt;T&gt; interface dispatch (about 2-4 times more expensive than a
+standard call) it also allows the enumerator type to be a struct without boxing
+(allocation is also very expensive). With the enumerator as a struct it also
+helps with inlining, especially if the fields are promoted to registers. The
+main detriment remaining is the <code>IEnumerator&lt;T&gt;</code> pattern. Every iteration requires
+two method calls and if any of those isn't inlined that can easily double the
+cost of an iteration. Unfortuately, that looks like exactly what happened in
+the benchmark&mdash;<code>MoveNext</code> is not inlined and it looks like the whole loop
+time is doubled.</p>
+<p>So, what about <code>ForeachIEnumerable</code>? This is the worst of all worlds. There's
+interface dispatch and allocation for <code>GetEnumerator()</code>, followed by double
+interface dispatch for each iteration, along with almost no inlining
+opportunity on any path. The results speak for themselves: <code>ForeachIEnumerable</code>
+is by far the worst result in the benchmark.</p>
+<h2>IFastEnumerable</h2>
+<p>So if IFastEnumerable is so terrible, let's look at some alternatives. First,
+Jared's <code>IFastEnumerableT&gt;</code>, with a minor modification:</p>
+<div class="highlight"><pre><span></span><span class="k">public</span> <span class="k">interface</span> <span class="n">IFastEnumerable</span><span class="p">&lt;</span><span class="n">TElement</span><span class="p">,</span> <span class="n">TEnumerator</span><span class="p">&gt;</span>
+<span class="p">{</span>
+  <span class="n">TEnumerator</span> <span class="n">Start</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+  <span class="n">TElement</span> <span class="nf">TryGetNext</span><span class="p">(</span><span class="k">ref</span> <span class="n">TEnumerator</span> <span class="n">enumerator</span><span class="p">,</span> <span class="k">out</span> <span class="kt">bool</span> <span class="k">value</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>This version switches the return type and the <code>out</code> parameter type, because
+<code>out</code> will require a memory barrier for some types, but never for <code>bool</code>.
+Looking at the benchmarks, when the implementation is known statically,
+<code>IFastEnumerable</code> blazes, beating even <code>ForLoop</code> due to better inlining. When
+we get down to the bare interface, though, things still don't look great.
+<code>IFastEnumerable</code> saves significantly due to only a single interface dispatch.
+That's about 33% better than <code>ForeachIEnumerable</code>, but that's not very high
+praise when compared to <code>ForLoop</code>. Since it looks like the main cost is
+indirection, let's try a little trick to reduce indirection and turn this:</p>
+<div class="highlight"><pre><span></span><span class="k">void</span> <span class="n">M</span><span class="p">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">TEnum</span><span class="p">&gt;(</span><span class="n">IFastEnumerable</span><span class="p">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">TEnum</span><span class="p">&gt;</span> <span class="n">ife</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>into this:</p>
+<div class="highlight"><pre><span></span><span class="k">void</span> <span class="n">M</span><span class="p">&lt;</span><span class="n">IFE</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">TEnum</span><span class="p">&gt;(</span><span class="n">IFE</span> <span class="n">ife</span><span class="p">)</span> <span class="k">where</span> <span class="n">IFE</span> <span class="p">:</span> <span class="n">IFastEnumerable</span><span class="p">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">TEnum</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>Now, if we get a struct implementing <code>IFastEnumerable&lt;T, TEnum&gt;</code> it won't be
+boxed and the method calls will be eligible for inlining. It's not a complete
+win&mdash;this incurs extra JIT cost. However, JIT cost can be defrayed by NGEN
+or crossgen in many cases and the benefits speak for themselves:
+<code>IFastEnumerableGeneric</code> is almost as fast as <code>FastEnumerable</code> and even faster
+than <code>ForLoop</code>. There is a big problem, though. The compiler is currently
+unable to infer the type arguments for this type of call, so the generic
+parameters have to be explicitly listed. If we want to use this interface and
+pattern it should probably coincide with a change to type inference in the C#
+compiler to fix this case (naively, I see no reason why it shouldn't be
+inferrable).</p>
+<h2>IFastEnumerator</h2>
+<p>Even with the fix to type inference, I have to admit I'm not satisfied. The
+previous method signature is obnoxious enough to type as is, even if I don't
+have to deal with any pain at the callsite. This is relevant because a lot
+of people use IEnumerable&lt;T&gt; explicitly, writing methods which take and
+return IEnumerable&lt;T&gt; types. So how can we make this better? Removing that
+extra type parameter for the enumerator is certainly a step in the right
+direction. Building on Jared's ideas, let's see what that would look like:</p>
+<div class="highlight"><pre><span></span><span class="k">public</span> <span class="k">interface</span> <span class="n">IFastEnumerator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="n">T</span> <span class="nf">TryGetNext</span><span class="p">(</span><span class="k">out</span> <span class="kt">bool</span> <span class="n">remaining</span><span class="p">);</span>
+    <span class="k">void</span> <span class="nf">Reset</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>As you can see, we've cut the extra type parameter, but we've also chosen a
+different interface: IFast<strong>Enumerator</strong>&lt;T&gt;. As I looked closer at
+IEnumerable&lt;T&gt; I started to feel that the entire interface was unnecessary.
+In the current implementation its only purpose was to return an enumerator,
+while in Jared's implementation it was eliminated, but at the cost of a type
+paraemeter.  I decided to go the other way&mdash;eliminate <code>IEnumerable&lt;T&gt;</code>
+and just use an <code>IFastEnumerator&lt;T&gt;</code> instead. In method calls users can use
+an <code>IFastEnumerator&lt;T&gt;</code> instead and <code>foreach</code> can be extended with a
+<code>GetFastEnumerator()</code> method, just like <code>Enumerator</code>. The real question is,
+compared to Jared's implementation, how much will it cost in performance?</p>
+<p>Based on the results from <code>FastEnumerator</code>, it looks like it costs nothing for
+the <code>foreach</code> case on a <code>List&lt;T&gt;</code> extension method. If we get a little more
+bold and pretend <code>List&lt;T&gt;</code> will be modified to work with <code>IFastEnumerator&lt;T&gt;</code>,
+it looks even better, encouraging more inlining bounds-check-elimination and
+handily beating out even the <code>for</code> loop.</p>
+<p>What about the naive <code>IFastEnumerator&lt;T&gt;</code> <code>foreach</code>? About the same as
+IFastEnumerable implementation&mdash;much better than <code>IEnumerable&lt;T&gt;</code>, but
+still slow. I'm reasonably convinced there's no real win to be had here.</p>
+<p>Finally, what about the generic "trick?" If we write our method as follows:</p>
+<div class="highlight"><pre><span></span><span class="k">void</span> <span class="n">M</span><span class="p">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">TEnum</span><span class="p">&gt;(</span><span class="k">ref</span> <span class="n">TEnum</span> <span class="n">fastEnum</span><span class="p">)</span> <span class="k">where</span> <span class="n">TEnum</span> <span class="p">:</span> <span class="n">IFastEnumerator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>type inference can actually figure this out without any modifications. However,
+it looks like <code>IFastEnumeratorGeneric</code> shows it to be about 80% slower than
+<code>IFastEnumerableGeneric</code> with the same trick. Why? Looking at the CLR inline
+decisions, it seems like everything is being inlined in both implementations.
+It looks like we'll have to look at the actual JIT'd assembly. The
+<code>IFastEnumerableGeneric</code> assembly is
+<a href="https://gist.github.com/agocke/696b2ab4c1fe8f1c333f81ba9ae3e4f3">here</a> and the
+<code>IFastEnumeratorGeneric</code> assembly is
+<a href="https://gist.github.com/agocke/c62f28def741e94c6ee23b9fb299838f">here</a>.</p>
+<p>Notably, the basic structure of the codegen for both methods seems identical.
+One thing that stands out is that every iteration in IFastEnumeratorGeneric
+seems to issue two loads, while <code>IFastEnumerableGeneric</code> seems to only take
+one. This appears to be because the JIT has hoisted the index variable into a
+register for <code>IFastEnumerableGeneric</code> and has kept it as a memory access for
+<code>IFastEnumeratorGeneric</code>. Given the extra overhead for an L1 cache lookup for
+each iteration, it seems plausible that this is the cause of the additional
+overhead. What's promising, however, is that I don't see any reason why the JIT
+would be unable to make the same optimization for <code>IFastEnumeratorGeneric</code>, so
+with some tweaking they may end up identical in codegen.</p>
+<p>So what's the verdict?</p>
+<h2>Conclusion</h2>
+<p>Now that we have some hard numbers on the various implementation strategies I
+think it will be much easier to decide on a future for IEnumerable&lt;T&gt;.
+Personally, I'm pretty pleased with both Jared's and my design, but I'm fairly
+convinced that mine is superior for the user, with only minor, fixeable
+performance issues in a single scenario.</p>
+<p>My next step will probably be to start constructing a PR for the <code>foreach</code> loop
+to generate the same code I hand-wrote for <code>IFastEnumerator</code> and make a NuGet
+package so everyone can pull in the new interface and start experimenting on
+their own.</p>
+<p>The main outstanding work, I think, is the LINQ extension methods. Many can
+probably be implemented more efficiently when armed with <code>IFastEnumerator</code> than
+they can now and that may even have more impact than a fixed <code>foreach</code>.</p>
+    </div>
+</section>
+
+            </main>
+            <footer>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>comment out</title><link href="http://commentout.com/" rel="alternate"></link><link href="http://commentout.com/feeds/all.atom.xml" rel="self"></link><id>http://commentout.com/</id><updated>2012-12-07T00:00:00-08:00</updated><entry><title>Tu Quoque</title><link href="http://commentout.com/tu-quoque.html" rel="alternate"></link><published>2012-12-07T00:00:00-08:00</published><author><name>Andy Gocke</name></author><id>tag:commentout.com,2012-12-07:tu-quoque.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>comment out</title><link href="http://commentout.com/" rel="alternate"></link><link href="http://commentout.com/feeds/blog.atom.xml" rel="self"></link><id>http://commentout.com/</id><updated>2012-12-07T00:00:00-08:00</updated><entry><title>Tu Quoque</title><link href="http://commentout.com/tu-quoque.html" rel="alternate"></link><published>2012-12-07T00:00:00-08:00</published><author><name>Andy Gocke</name></author><id>tag:commentout.com,2012-12-07:tu-quoque.html</id><summary type="html">
     &lt;header&gt;
       &lt;div id="hlogo"&gt;
         &lt;a href="#"&gt;&lt;/a&gt;
