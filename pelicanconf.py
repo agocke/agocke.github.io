@@ -6,8 +6,6 @@ AUTHOR = u'Andy Gocke'
 SITENAME = u'comment out'
 SITEURL = 'http://commentout.com'
 
-PATH = 'content'
-
 TIMEZONE = 'America/Los_Angeles'
 
 DEFAULT_LANG = u'en'
@@ -32,6 +30,8 @@ SOCIAL = (('You can add links in your config file', '#'),
           ('Another social link', '#'),)
 
 DEFAULT_PAGINATION = False
+
+MD_EXTENSIONS = ['codehilite(css_class=highlight)', 'extra']
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True

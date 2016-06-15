@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | commentout.net{% endblock %}
+
+{% block content %}
+
+<section id="content" class="body">
+    <h1>{{ article.title }}</h1>
+    <h2>{{ article.subtitle }}</h2>
+
+    <div class="article-content">
+        {{ article.content }}
+    </div>
+</section>
+
+{% endblock %}
