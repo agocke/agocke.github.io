@@ -1,6 +1,7 @@
 body {
     margin: 0px;
     padding: 0px;
+    background-color: #FDFDFD;
 }
 
 a {
@@ -9,7 +10,7 @@ a {
 }
 
 #box {
-    background-color: #FDFDFD;
+    background-color: #ffffff;
     width: 1000px;
     margin: auto;
 }
