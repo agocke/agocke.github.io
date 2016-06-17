@@ -9,6 +9,7 @@ a {
 }
 
 #box {
+    background-color: #FDFDFD;
     width: 1000px;
     margin: auto;
 }
@@ -59,7 +60,7 @@ main {
     width: 800px;
     color: #0C1408;
     font-size:1.2em;
-    font-family: 'Cormorant Garamond', 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
+    font-family: "adobe-garamond-pro", 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
     text-align: center;
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
