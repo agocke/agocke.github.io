@@ -64,6 +64,9 @@ main {
     font-size:1.2em;
     font-family: 'Cormorant Garamond', 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
     text-align: center;
+    text-rendering: optimizeLegibility !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important; 
 }
 
 main code {
