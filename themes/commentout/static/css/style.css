@@ -28,7 +28,7 @@ nav {
 }
 
 nav #home {
-    font-family: 'ubuntu-mono', monospace;
+    font-family: 'Inconsolata', monospace;
     font-size: 1.3em;
     font-style: italic;
     line-height: 40px;
@@ -61,8 +61,8 @@ main {
     margin-right: auto;
     width: 800px;
     color: #0C1408;
-    font-size:1.1em;
-    font-family: 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
+    font-size:1.2em;
+    font-family: 'Cormorant Garamond', 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
     text-align: center;
 }
 
@@ -73,12 +73,16 @@ main code {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     border-radius: 0.2em;
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.9em;
 }
 
 main pre {
     background-color: #eff0f1;
     padding: 0.7em 1.0em;
     border-radius: 0.5em;
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.8em;
 }
 
 main h1 {
