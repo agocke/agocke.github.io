@@ -56,16 +56,21 @@ nav li {
 }
 
 main {
+    display: block;
     margin-left: auto;
     margin-right: auto;
     width: 800px;
     color: #0C1408;
-    font-size:1.2em;
-    font-family: "adobe-garamond-pro", 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
-    text-align: center;
+    font-size: 1.0em;
+    font-family: 'PT Serif', 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important; 
+}
+
+main #content {
+    margin-top: 20px;
+    display: inline-block;
 }
 
 main code {
@@ -88,10 +93,11 @@ main pre {
 }
 
 main h1 {
-    font-size: 1.35em;
+    font-size: 2em;
     font-weight: normal;
     clear: both;
-    text-decoration: underline;
+    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+    margin-bottom: 20px;
 }
 
 main .article-content {
