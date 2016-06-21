@@ -9,6 +9,7 @@ SITEURL = 'http://commentout.com'
 TIMEZONE = 'America/Los_Angeles'
 
 DEFAULT_LANG = u'en'
+DEFAULT_DATE_FORMAT = ('%Y. %b. %d')
 
 THEME = 'themes/commentout'
 

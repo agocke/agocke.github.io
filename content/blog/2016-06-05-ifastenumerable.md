@@ -1,4 +1,5 @@
 Title: Time to Pay the Piper
+Subtitle: Exploring the performance of IEnumerable<T>
 Slug: ifastenumerable
 Status: draft
 
