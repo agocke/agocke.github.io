@@ -92,12 +92,26 @@ main pre {
     font-size: 0.8em;
 }
 
-main h1 {
+main .title {
     font-size: 2em;
     font-weight: normal;
     clear: both;
     font-family: 'PT Sans', Helvetica, Arial, sans-serif;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
+}
+
+main .article-subtitle {
+    margin-top: 0px;
+    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 1.2em;
+    color: #444;
+}
+
+main .article-date {
+    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+    color: #999;
 }
 
 main .article-content {
