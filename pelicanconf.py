@@ -20,6 +20,9 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+STATIC_PATHS = [ 'extras/CNAME' ]
+EXTRA_PATH_METADATA = { 'extras/CNAME': { 'path': 'CNAME' }, }
+
 # Blogroll
 LINKS = (('Pelican', 'http://getpelican.com/'),
          ('Python.org', 'http://python.org/'),
