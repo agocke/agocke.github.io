@@ -127,8 +127,8 @@ main .article-content a:hover {
 }
 
 main .article-content h2 {
-    text-decoration: underline;
     font-weight: normal;
+    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
 }
 
 footer {
