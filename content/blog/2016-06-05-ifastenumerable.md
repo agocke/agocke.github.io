@@ -3,41 +3,51 @@ Subtitle: Exploring the performance of IEnumerable<T>
 Slug: ifastenumerable
 Status: draft
 
-As many users of C# know, one of the most common reasons developers prefer
-C# to languages like C and C++ is increased expressivity. Over the past few
-releases the language and compiler team have tried to provide even more
+As many users of C# know, one of the more common reasons developers prefer
+C# to languages like C and C++ is expressivity. Over the past few
+releases the language and compiler team have tried to provide more
 expressivity through features like `dynamic` and LINQ. Unfortunately, such
-features have not been "free." `dynamic` especially incurred significant run
-time overhead for its use.
+features have not been "free," incurring significant run time overhead for
+their use.
 
-Recently, the compiler and language teams have been taking a closer look at
-these tradeoffs and considering a number of language features to help buy back
-some of that bare-metal speed. Some examples include ref-locals, 
-ref-returns, and "replaceable" `Task<T>` for async, all of which make it easier
-to avoid allocating memory, a very common cause for performance issues in
-managed code.  We're calling this strategy "pay-for-play." The idea is that you
-should be able to progressively buy into language features. Only using the
-simple aspects of features shouldn't necessitate a heavy performance penalty.
+Recently the compiler team has been taking a closer look at these tradeoffs and
+considering a number of language features to help buy back some of that
+bare-metal speed. In our experience, one of the biggest causes of performance
+issues in C# code is allocating memory, so proposed features include
+[ref-locals and ref-returns](https://github.com/dotnet/roslyn/issues/118), and
+["replaceable" `Task<T>` for
+async](https://github.com/ljw1004/roslyn/blob/features/async-return/docs/specs/feature%20-%20arbitrary%20async%20returns.md),
+all of which make it easier to avoid allocating memory. In essence we're
+adapting C++'s "pay-for-play" strategy. The idea is that you should be able to
+progressively buy into language features such that only using the simple aspects of
+features shouldn't necessitate a heavy performance penalty.
 
-Unfortunately, one of the most heavily used and praised features in C# is one
-with a pretty bad pay/play ratio: LINQ. LINQ is loved because it can turn
-a multiline foreach and if statement into a quick `array.Where`, but it also
-turns out that that short statement can be as much as an order of magnitude
-worse in performance than the prolix foreach.
+Unfortunately, one of the most popular features in C# is one with a pretty bad
+pay/play ratio: LINQ. LINQ is loved because it can turn a multi-line `foreach`
+and if statement into a quick `array.Where`, but it also turns out that that
+short statement can be as much as an order of magnitude worse in performance
+than the long-winded `foreach`.
 
-So, what can we do to "fix" LINQ? The first place to start is probably
+What can we do to "fix" LINQ? The first place to start is probably
 `IEnumerable<T>`&mdash;the glue interface that holds all of LINQ together. Of
 course, I'm not the only one to try taking on IEnumerable&lt;T>. Jared Parsons,
-my lead (whose solution is obviously the best), wrote [this
+my lead, wrote [this
 article](http://blog.paranoidcoding.com/2014/08/19/rethinking-enumerable.html)
 on how to change IEnumerable&lt;T> to a more optimization-friendly structure.
-Jared's design was, however, lacking one very important thing: an
-implementation. I decided to give implementing IFastEnumerable&lt;T> a shot.
-While I believed that Jared's design is very fast, I also have to admit that I
-hate passing around the extra type parameter, so I've also tried implementing
-my own design with only a single type parameter.
+However, Jared's design was lacking one very important thing: an
+implementation. I decided to give implementing `IFastEnumerable<T>` a shot.
+While I believed that Jared's design would be very fast, I also have to admit
+that I hate passing around the extra type parameter, so I've also tried
+implementing [my own design with only a single type
+parameter](https://github.com/agocke/fast-enumerable/blob/master/IFastEnumerator.cs).
 
-Without further ado, let's take a look at some benchmarks:
+Without further ado, let's take a look at some benchmarks.  These numbers come
+from the repository at
+[https://github.com/agocke/fast-enumerable](https://github.com/agocke/fast-enumerable).
+I examined `IEnumerable<T>` and two possible alternative implementations. The
+first alternative is Jared's with a few minor tweaks, while the second is my
+own.
+
 
     // * Summary *
     BenchmarkDotNet=v0.9.7.0
@@ -53,21 +63,17 @@ Without further ado, let's take a look at some benchmarks:
                     ForLoop |   276.3182 us | 14.0787 us |
                 ForEachLoop |   604.3452 us | 16.3732 us |
          ForeachIEnumerable | 1,677.7799 us | 56.6016 us |
+    ------------------------------------------------------
              FastEnumerable |   248.7717 us |  6.2044 us |
        MyListFastEnumerable |   304.5593 us | 16.9211 us |
             IFastEnumerable | 1,012.0536 us | 62.9473 us |
      IFastEnumerableGeneric |   250.7948 us |  6.8619 us |
+    ------------------------------------------------------
              FastEnumerator |   260.7068 us | 12.6347 us |
        MyListFastEnumerator |   182.6534 us |  2.5559 us |
             IFastEnumerator |   978.0919 us | 16.6613 us |
      IFastEnumeratorGeneric |   452.1760 us | 16.3232 us |
     // ***** BenchmarkRunner: End *****
-
-These numbers come from the repository at
-[https://github.com/agocke/fast-enumerable](https://github.com/agocke/fast-enumerable).
-I examined `IEnumerable<T>` and two possible alternative implementations. The
-first alternative is Jared's with a few minor tweaks, while the second is my
-own, with the constraint of only using a single type parameter.
 
 ## IEnumerable&lt;T>
 
@@ -88,9 +94,9 @@ First, here are some basic primitives, roughly ordered by expected cost:
 4. Function call
 5. L1 cache miss
 
-So let's look at `ForLoop`. This is a simple for-loop over a `List<T>` field.
+Let's look at `ForLoop`. This is a simple for-loop over a `List<T>` field.
 There's not much here, just an integer counter, a bounds check, an element
-access, and an add to a 64-bit accumulator. So what would optimal code look
+access, and an add to a 64-bit accumulator. What would optimal code look
 like to me? Probably something like (in asm-pseudocode):
 
 
@@ -107,7 +113,7 @@ like to me? Probably something like (in asm-pseudocode):
     done:
     ret
 
-So what's the probability that this is the code that actually gets generated?
+What's the probability that this is the code that actually gets generated?
 Pretty low, actually. There are a number of assumptions I made that aren't easy
 for a compiler to make. While it looks like the iteration over the `List` is
 simple, there are a number of indirect calls in the iteration.  First,
@@ -125,7 +131,7 @@ make these optimizations, especially if the instance of the `List<int>` is
 method-local, making threading and alias analysis much easier.  Regardless, we
 can look at this as close to the pinnacle of codegen.
 
-So what about `ForeachLoop`? It doesn't look good at first, but `List<T>`
+What about `ForeachLoop`? It doesn't look good at first, but `List<T>`
 actually takes advantage of a little-known optimization available for `foreach`
 included in C#. When running on IEnumerable, `foreach` usually invokes
 `IEnumerable<T>.GetEnumerator()` but, if available, `foreach` will instead use
@@ -141,7 +147,7 @@ cost of an iteration. Unfortuately, that looks like exactly what happened in
 the benchmark&mdash;`MoveNext` is not inlined and it looks like the whole loop
 time is doubled.
 
-So, what about `ForeachIEnumerable`? This is the worst of all worlds. There's
+What about `ForeachIEnumerable`? This is the worst of all worlds. There's
 interface dispatch and allocation for `GetEnumerator()`, followed by double
 interface dispatch for each iteration, along with almost no inlining
 opportunity on any path. The results speak for themselves: `ForeachIEnumerable`
@@ -201,7 +207,7 @@ Even with the fix to type inference, I have to admit I'm not satisfied. The
 previous method signature is obnoxious enough to type as is, even if I don't
 have to deal with any pain at the callsite. This is relevant because a lot
 of people use IEnumerable&lt;T> explicitly, writing methods which take and
-return IEnumerable&lt;T> types. So how can we make this better? Removing that
+return IEnumerable&lt;T> types. How can we make this better? Removing that
 extra type parameter for the enumerator is certainly a step in the right
 direction. Building on Jared's ideas, let's see what that would look like:
 
@@ -262,7 +268,7 @@ overhead. What's promising, however, is that I don't see any reason why the JIT
 would be unable to make the same optimization for `IFastEnumeratorGeneric`, so
 with some tweaking they may end up identical in codegen.
 
-So what's the verdict?
+What's the verdict?
 
 ## Conclusion
 
