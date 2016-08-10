@@ -13,6 +13,7 @@ a {
     background-color: #ffffff;
     width: 1000px;
     margin: auto;
+    margin-bottom: 100px;
 }
 
 nav {
@@ -74,7 +75,7 @@ main #content {
 }
 
 main code {
-    background-color: #eff0f1;
+    background-color: #f0f0f0;
     padding-left: 0.3em;
     padding-right: 0.3em;
     padding-top: 0.2em;
@@ -82,14 +83,17 @@ main code {
     border-radius: 0.2em;
     font-family: 'Inconsolata', monospace;
     font-size: 0.9em;
+    color: #c71d47;
 }
 
 main pre {
-    background-color: #eff0f1;
+    background-color: #ffffff;
     padding: 0.7em 1.0em;
-    border-radius: 0.5em;
+    border-width: 0.1em;
+    border-style: solid;
+    border-color: #cccccc;
     font-family: 'Inconsolata', monospace;
-    font-size: 0.8em;
+    font-size: 0.9em;
 }
 
 main .title {
@@ -133,4 +137,5 @@ main .article-content h2 {
 
 footer {
     clear: both;
+    height: 100px;
 }
