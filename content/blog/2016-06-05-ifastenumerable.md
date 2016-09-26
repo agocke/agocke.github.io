@@ -148,8 +148,8 @@ What about `ForeachLoop`? It doesn't look good at first but, as I mentioned
 earlier, `foreach` has its little tricks. `List<T>` actually takes advantage
 of a little-known optimization available for `foreach` included in C#: when
 running on `IEnumerable<T>`, `foreach` normally invokes
-`IEnumerable<T>.GetEnumerator()`. But, if the type has a property named
-`Enumerator` and that property returns a type that *structurally* matches the
+`IEnumerable<T>.GetEnumerator()`. But, if the type has a method named
+`GetEnumerator` and that method returns a type that *structurally* matches the
 `IEnumerator<T>` interface, `foreach` will use that instead. `List<T>` has all
 of this, so this path is used whenever `foreach` is called on a list directly.
 Aside from saving the `IEnumerable<T>` interface dispatch (about 2-4 times more
