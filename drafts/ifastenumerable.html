@@ -160,8 +160,8 @@ the CLR's attempt as close to the pinnacle of codegen.</p>
 earlier, <code>foreach</code> has its little tricks. <code>List&lt;T&gt;</code> actually takes advantage
 of a little-known optimization available for <code>foreach</code> included in C#: when
 running on <code>IEnumerable&lt;T&gt;</code>, <code>foreach</code> normally invokes
-<code>IEnumerable&lt;T&gt;.GetEnumerator()</code>. But, if the type has a property named
-<code>Enumerator</code> and that property returns a type that <em>structurally</em> matches the
+<code>IEnumerable&lt;T&gt;.GetEnumerator()</code>. But, if the type has a method named
+<code>GetEnumerator</code> and that method returns a type that <em>structurally</em> matches the
 <code>IEnumerator&lt;T&gt;</code> interface, <code>foreach</code> will use that instead. <code>List&lt;T&gt;</code> has all
 of this, so this path is used whenever <code>foreach</code> is called on a list directly.
 Aside from saving the <code>IEnumerable&lt;T&gt;</code> interface dispatch (about 2-4 times more
