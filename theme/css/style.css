@@ -94,6 +94,8 @@ main pre {
     border-color: #cccccc;
     font-family: 'Inconsolata', monospace;
     font-size: 0.9em;
+    width: 800px;
+    overflow-y: scroll;
 }
 
 main .title {
