@@ -20,7 +20,7 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
-STATIC_PATHS = [ 'extras/CNAME' ]
+STATIC_PATHS = [ 'extras/CNAME', 'images' ]
 EXTRA_PATH_METADATA = { 'extras/CNAME': { 'path': 'CNAME' }, }
 
 # Blogroll
