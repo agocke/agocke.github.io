@@ -1,5 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>comment out</title><link href="https://commentout.net/" rel="alternate"></link><link href="https://commentout.net/feeds/blog.atom.xml" rel="self"></link><id>https://commentout.net/</id><updated>2017-05-03T00:00:00-07:00</updated><entry><title>Cool Colors in WSL/Bash</title><link href="https://commentout.net/wsl-colors.html" rel="alternate"></link><published>2017-05-03T00:00:00-07:00</published><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-03:wsl-colors.html</id><summary type="html">&lt;p&gt;As some may know, before joining Microsoft to work on the C# compiler I was a pretty dedicated Linux user (Arch, thanks for asking) and despite finding replacements for a number of my Linux workflow standbys, I've never found a good substitute for the Unix shell. Enter the &lt;a href="https://blogs.msdn.microsoft.com/wsl/"&gt;Windows Subsystem for Linux&lt;/a&gt; AKA "Bash on Windows" AKA "GNU/NT". It's not yet my daily driver, but it's getting closer every update.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>comment out</title><link href="https://commentout.net/" rel="alternate"></link><link href="https://commentout.net/feeds/blog.atom.xml" rel="self"></link><id>https://commentout.net/</id><updated>2017-05-08T00:00:00-07:00</updated><entry><title>Stamping Git SHAs into Your Binaries</title><link href="https://commentout.net/sha-in-binary.html" rel="alternate"></link><published>2017-05-08T00:00:00-07:00</published><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-08:sha-in-binary.html</id><summary type="html">&lt;p&gt;Have you ever looked at a binary from a project you wrote and asked, "Where the hell
+are the sources for this?" Well, I'm about to make your life (and the lives of your
+customers) a bit easier. I'm going to show you how to write the Git SHA1 for each
+commit directly into the resulting binaries.&lt;/p&gt;
+&lt;p&gt;If your build is anything like Roslyn you may have a half dozen different branches,
+each with their own little modifications, each of which get built occasionally for
+testing or prerelease validation. Often I'll find Roslyn binaries randomly floating
+in a share somewhere or attached to a bug report with little to no context. While
+we do have carefully incremented version numbers in our builds, it can be a challenge
+to even reverse engineer a version into a specific source code commit. If each branch
+doesn't have its own versioning scheme it's possible that two branches could
+produce binaries with the exact same version, even if they came from completely
+different source code. Solution: write the commit SHA directly into the binary. Then
+you'll always know exactly what code was used to build the binary. This
+guide will be targeted at people building .NET applications, but I'll give general
+advice where applicable and you can choose what makes sense for your build.&lt;/p&gt;
+&lt;p&gt;The first question is, where in the binary do we write the SHA? My answer is: wherever
+it's easiest to see. For console programs, that may mean including the SHA in the output
+from a &lt;code&gt;--version&lt;/code&gt; flag. For most programs, I think the file metadata, as displayed by
+a common file system browser on your preferred OS, is the most accessible tag. Specifically,
+for .NET programs I like using the &lt;code&gt;AssemblyInformationalVersionAttribute&lt;/code&gt;. This tag&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Is only specified as a block of text, making it perfect for human-readable unstructured
+     data.&lt;/li&gt;
+&lt;li&gt;Is viewable by default in the Windows File Explorer both in the file listing view
+     and in the properties window.&lt;/li&gt;
+&lt;li&gt;Is easily accessible by .NET code via reflection.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here's what it looks like in File Explorer with details expanded:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="File explorer screenshot" src="https://commentout.net/images/file-xplore.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;For Unix-like systems I would probably try to use extended file attributes, although
+an exact analog is hard to come by because this is not exactly standardized across POSIX
+systems.&lt;/p&gt;
+&lt;p&gt;Once you've figured out where to put the SHA, you need to retrieve the SHA in the first
+place. Now I know what you're thinking: "well that's easy, I'll just shell out to git
+and run a quick &lt;code&gt;git rev-parse HEAD&lt;/code&gt;...". Nuh-uh. Let's assume that Git is installed on
+the machine&amp;mdash;what makes you think it's available on the path? As I found out quite
+quickly when I implemented this for Roslyn, there are a lot of instances where someone
+may be building your code (like in a build lab) that checks out the Git repository, but
+doesn't build with Git on the path. Instead, I found that the most robust method is to
+either pass the SHA through an environment variable generated by the build environment,
+or to grab the SHA directly out of the Git object directory. Don't worry, I won't let
+you leave you flailing; here's the Roslyn MSBuild logic for finding and reading the
+Git SHA (sorry about the XML).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;When&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;$(BUILD_SOURCEVERSION)&amp;#39; != &amp;#39;&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;PropertyGroup&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;GitHeadSha&amp;gt;&lt;/span&gt;$(BUILD_SOURCEVERSION)&lt;span class="nt"&gt;&amp;lt;/GitHeadSha&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/PropertyGroup&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/When&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;When&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;$(BUILD_SOURCEVERSION)&amp;#39; == &amp;#39;&amp;#39; AND &amp;#39;$(GIT_COMMIT)&amp;#39; != &amp;#39;&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;PropertyGroup&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;GitHeadSha&amp;gt;&lt;/span&gt;$(GIT_COMMIT)&lt;span class="nt"&gt;&amp;lt;/GitHeadSha&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/PropertyGroup&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/When&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;Otherwise&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;PropertyGroup&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;GitHeadSha&amp;gt;&lt;/span&gt;Not found&lt;span class="nt"&gt;&amp;lt;/GitHeadSha&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;DotGitDir&amp;gt;&lt;/span&gt;$([System.IO.Path]::GetFullPath(&amp;#39;$(MSBuildThisFileDirectory)../../.git&amp;#39;))&lt;span class="nt"&gt;&amp;lt;/DotGitDir&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;HeadFileContent&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Exists(&amp;#39;$(DotGitDir)/HEAD&amp;#39;)&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;$([System.IO.File]::ReadAllText(&amp;#39;$(DotGitDir)/HEAD&amp;#39;).Trim())&lt;span class="nt"&gt;&amp;lt;/HeadFileContent&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;RefPath&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$(HeadFileContent.StartsWith(&amp;#39;ref: &amp;#39;))&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;$(DotGitDir)/$(HeadFileContent.Substring(5))&lt;span class="nt"&gt;&amp;lt;/RefPath&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;GitHeadSha&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;$(RefPath)&amp;#39; != &amp;#39;&amp;#39; AND Exists(&amp;#39;$(RefPath)&amp;#39;)&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;$([System.IO.File]::ReadAllText(&amp;#39;$(RefPath)&amp;#39;).Trim())&lt;span class="nt"&gt;&amp;lt;/GitHeadSha&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;GitHeadSha&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;$(HeadFileContent)&amp;#39; != &amp;#39;&amp;#39; AND &amp;#39;$(RefPath)&amp;#39; == &amp;#39;&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;$(HeadFileContent)&lt;span class="nt"&gt;&amp;lt;/GitHeadSha&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/PropertyGroup&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/Otherwise&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It's  a little verbose, but should be pretty straight-forward. We first try to
+read the SHA directly out of the refs file in &lt;code&gt;.git/HEAD&lt;/code&gt; prefixed with the
+text &lt;code&gt;ref:&lt;/code&gt;. Otherwise we assume a format called a &lt;a href="https://git-scm.com/docs/git-pack-refs"&gt;"packed
+ref"&lt;/a&gt;, which I won't go into detail
+on here. It's basically a pointer to another file, so we just read the new
+file and use the content from the second file. Afterwards, the &lt;code&gt;GitHeadSha&lt;/code&gt;
+param is passed to &lt;code&gt;&amp;lt;AssemblyInformationalVersionAttribue&amp;gt;&lt;/code&gt;, where it flows
+into the binary.&lt;/p&gt;
+&lt;p&gt;With that I'll leave you to try this yourself, and hopefully your days of playing source-code-detective are over.&lt;/p&gt;</summary></entry><entry><title>Cool Colors in WSL/Bash</title><link href="https://commentout.net/wsl-colors.html" rel="alternate"></link><published>2017-05-03T00:00:00-07:00</published><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-03:wsl-colors.html</id><summary type="html">&lt;p&gt;As some may know, before joining Microsoft to work on the C# compiler I was a pretty dedicated Linux user (Arch, thanks for asking) and despite finding replacements for a number of my Linux workflow standbys, I've never found a good substitute for the Unix shell. Enter the &lt;a href="https://blogs.msdn.microsoft.com/wsl/"&gt;Windows Subsystem for Linux&lt;/a&gt; AKA "Bash on Windows" AKA "GNU/NT". It's not yet my daily driver, but it's getting closer every update.&lt;/p&gt;
 &lt;p&gt;One great new feature was &lt;a href="https://blogs.msdn.microsoft.com/commandline/2016/09/22/24-bit-color-in-the-windows-console/"&gt;24-bit color&lt;/a&gt;. It may seem petty, but when your entire user interface is text, every small delineation makes a huge difference in user experience. One nit is that, while it's easy for programs to output text in full color with this change, it's not easy for you, the user, to change the &lt;em&gt;color palette&lt;/em&gt;. What's the difference, you ask? A color code can be used to explicitly change the current foreground or background color to a specific shade. The color palette, however, indicates what the default color shades are. For instance, if a program says, "change the foreground color to red", but doesn't explicitly mention a shade of red, the shade of red that gets chosen is whatever red maps to in the color palette.&lt;/p&gt;
 &lt;p&gt;It practice, most terminal programs don't specify the exact color shade, but instead use on of the standard colors. There are two big benefits to that. First, you don't have to know exactly what color shades the terminal supports and, second, you don't run the risk of your chosen color shade not being visible against the other color shades in the terminal (assuming the user set their palette properly).&lt;/p&gt;
 &lt;p&gt;So WSL lets programs use a wide gamut of colors, but doesn't let them easily customize their color palette, often referred to as a theme. Luckily, Linux has a long history of theme customization, so all WSL needs is a bridge from the Linux tools to the Windows tools. Enter &lt;a href="https://github.com/agocke/xres2lnk"&gt;xres2lnk&lt;/a&gt;. This is a program I wrote to translate colors from a standard XResources file (a common format for Unix terminals) into a shortcut file. Why a shortcut file? Well, aside from the registry it's the only way to save customized colors for a console on Windows and in my experience it's much easier to save and sync between multiple computers. You can also save different color themes to different shortcuts, so you can use different color themes for different terminal sessions.&lt;/p&gt;
