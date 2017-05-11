@@ -69,8 +69,8 @@ Git SHA (sorry about the XML).&lt;/p&gt;
 &lt;p&gt;It's  a little verbose, but should be pretty straight-forward. We first try to
 read the SHA directly out of the refs file in &lt;code&gt;.git/HEAD&lt;/code&gt; prefixed with the
 text &lt;code&gt;ref:&lt;/code&gt;. Otherwise we assume a format called a &lt;a href="https://git-scm.com/docs/git-pack-refs"&gt;"packed
-ref"&lt;/a&gt;, which I won't go into detail
-on here. It's basically a pointer to another file, so we just read the new
+ref"&lt;/a&gt;, on which I won't go into detail
+here. It's basically a pointer to another file, so we just read the new
 file and use the content from the second file. Afterwards, the &lt;code&gt;GitHeadSha&lt;/code&gt;
 param is passed to &lt;code&gt;&amp;lt;AssemblyInformationalVersionAttribue&amp;gt;&lt;/code&gt;, where it flows
 into the binary.&lt;/p&gt;
