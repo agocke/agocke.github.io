@@ -88,13 +88,13 @@ main code {
 
 main pre {
     background-color: #ffffff;
-    padding: 0.7em 1.0em;
+    padding: 10px 20px;
     border-width: 0.1em;
     border-style: solid;
     border-color: #cccccc;
     font-family: 'Inconsolata', monospace;
     font-size: 0.9em;
-    width: 800px;
+    width: 900px;
     overflow-y: scroll;
 }
 
