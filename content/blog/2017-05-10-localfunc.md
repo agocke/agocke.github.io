@@ -48,7 +48,7 @@ void Method(string str)
 
 If nothing else, you might find this more readable due to the parameter types
 being right next to the parameter names. In case that's not enough, here's
-a list of things that local functions can do that local functions can't:
+a list of things that local functions can do that lambdas can't:
 
 * Local functions can be recursive[^2]
 
