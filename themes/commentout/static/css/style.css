@@ -137,6 +137,11 @@ main .article-content h2 {
     font-family: 'PT Sans', Helvetica, Arial, sans-serif;
 }
 
+main .article-content .footnote {
+    margin-top: 200px;
+    font-size: 0.9em;
+}
+
 footer {
     clear: both;
     height: 100px;
