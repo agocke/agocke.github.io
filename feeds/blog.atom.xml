@@ -1,5 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>comment out</title><link href="https://commentout.net/" rel="alternate"></link><link href="https://commentout.net/feeds/blog.atom.xml" rel="self"></link><id>https://commentout.net/</id><updated>2017-05-08T00:00:00-07:00</updated><entry><title>Stamping Git SHAs into Your Binaries</title><link href="https://commentout.net/sha-in-binary.html" rel="alternate"></link><updated>2017-05-08T00:00:00-07:00</updated><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-08:sha-in-binary.html</id><summary type="html">&lt;p&gt;Have you ever looked at a binary from a project you wrote and asked, "Where the hell
+<feed xmlns="http://www.w3.org/2005/Atom"><title>comment out - blog</title><link href="https://commentout.net/" rel="alternate"></link><link href="https://commentout.net/feeds/blog.atom.xml" rel="self"></link><id>https://commentout.net/</id><updated>2017-10-13T00:00:00-07:00</updated><entry><title>Lambdas and Local Functions</title><link href="https://commentout.net/localfunc.html" rel="alternate"></link><published>2017-10-13T00:00:00-07:00</published><updated>2017-10-13T00:00:00-07:00</updated><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-10-13:/localfunc.html</id><summary type="html">&lt;p&gt;Ever since local functions were added in C# 7 a common user question has
+been, "when should I use them instead of a lambda?" They're both forms of
+functions that can be nested within other functions, so it's reasonable to
+ask what the difference is. First, it's probably useful to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Ever since local functions were added in C# 7 a common user question has
+been, "when should I use them instead of a lambda?" They're both forms of
+functions that can be nested within other functions, so it's reasonable to
+ask what the difference is. First, it's probably useful to say when &lt;em&gt;can&lt;/em&gt; you
+use them instead of a lambda. The answer is: wherever you can define a
+statement, you can use a local function instead of a lambda. Basically, if
+there's a pair of curly braces, you can use a local function instead of a
+lambda. The only thing that a lambda can do that a local function cannot is
+be defined in an expression context (like a field initializer).&lt;sup id="fnref-1"&gt;&lt;a class="footnote-ref" href="#fn-1"&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;So now that we've covered where you &lt;em&gt;can&lt;/em&gt; use local functions instead of
+lambdas, that leaves the question of where you &lt;em&gt;should&lt;/em&gt;. This is somewhat
+of a personal style question, but I can give you some situations where
+local functions can do things that lambdas can't. The most obvious of these
+is that local functions can have names, while lambdas can't. In fact,
+the spec also uses the words "anonymous function" to refer to lambda methods.
+Similarly, the term "lambda" (referring to the symbol λ), is what Alonzo
+Church used to represent anonymous functions when he invented them.&lt;/p&gt;
+&lt;p&gt;That means that if you're currently writing code like&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;Method&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;str&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;Func&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;myFunc&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TryParse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;myFunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;str&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;you should consider rewriting it into something like&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;Method&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;str&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;MyFunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TryParse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;MyFunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If nothing else, you might find this more readable due to the parameter types
+being right next to the parameter names. In case that's not enough, here's
+a list of things that local functions can do that lambdas can't:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Local functions can be called without converting to a delegate, so you don't
+  need to wrap them in &lt;code&gt;Func&lt;/code&gt; or &lt;code&gt;Action&lt;/code&gt; if you're just calling from your
+  current method&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local functions can be recursive&lt;sup id="fnref-2"&gt;&lt;a class="footnote-ref" href="#fn-2"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local functions can be iterators&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Since iterators don't start running until you start iterating over them
+    this can be very useful if you want to do a little early-validation for
+    your iterator method. You can stick the body of your iterator in a local
+    function, do your validation up front, and then call your iterator.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local functions can be generic (e.g., &lt;code&gt;bool Local&amp;lt;T&amp;gt;(T t) =&amp;gt; t == default(T);&lt;/code&gt;)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local functions have strictly more precise definite assignment rules&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In certain cases, local functions do not need to allocate memory on the heap&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Those last two points are pretty complicated, so let me explain in more
+detail. First, definite assignment. Definite assignment is the rule that in
+C#, all variables must definitely be assigned before they can be used. This
+is the actual reason that lambdas cannot be recursive; the lambda is defined
+before it is assigned to the delegate, so the delegate variable cannot be
+used in the body of the lambda until it's been assigned. This is why&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Action&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;produces the error, &lt;code&gt;Use of unassigned local variable 'a'&lt;/code&gt;, while&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Action&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;null&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; 
+&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;compiles without issue.&lt;/p&gt;
+&lt;p&gt;However, there's more to just definite assignment then just the variable the
+local function is assigned to. There's also the matter of captured variables.
+Variables captured within lambdas are required to be definitely assigned
+whenever a lambda is used. Lambdas are considered used when they are converted
+to delegates&lt;sup id="fnref-3"&gt;&lt;a class="footnote-ref" href="#fn-3"&gt;3&lt;/a&gt;&lt;/sup&gt;, so all captured variables must be definitely assigned at
+the lambda declaration point. On the other hand, while local functions also
+require captured variables to be assigned when they're converted to delegates,
+local function declarations aren't considered usage. This allows you to do things
+like define your local functions at the end of the method, even after &lt;code&gt;return&lt;/code&gt;
+statements, and the assignment rules will only be enforced at the usage point.
+For example,&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;Func&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;M&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;Func&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;eqZ&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="p"&gt;==&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// Lambda: Illegal, y hasn&amp;#39;t been assigned yet&lt;/span&gt;
+
+    &lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="nf"&gt;EqZ&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="p"&gt;==&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// Local Function: Perfectly fine, just the definition&lt;/span&gt;
+
+    &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;EqZ&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// y is assigned at the delegate conversion, so it&amp;#39;s all good&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you don't convert the local function to a delegate, but instead just call
+it like a method, things get even fancier. Unlike lambdas, local functions
+can also definitely assign captured variables in their enclosing method scope.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="nf"&gt;M&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;Local&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+    &lt;span class="k"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;Local&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is all a consequence of the fact that the compiler can "see through" calls
+to local functions in the current method. This means they can have complex
+definite assignment across calls, but also that their compilation can be more
+advanced in general.&lt;/p&gt;
+&lt;p&gt;The most notable use of the extra information is avoiding heap allocation
+when 1) the local function is not converted to a delegate and 2) none of the
+variables it captures are captured by lambdas or local functions converted to
+delegates.&lt;sup id="fnref-4"&gt;&lt;a class="footnote-ref" href="#fn-4"&gt;4&lt;/a&gt;&lt;/sup&gt; For example, if you take existing lambda code&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="nf"&gt;M&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;myCollection&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// Pretend this helper does something complex&lt;/span&gt;
+        &lt;span class="n"&gt;Func&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;helper&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;IsValid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;helper&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and rewrite it to&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="nf"&gt;M&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;myCollection&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kt"&gt;bool&lt;/span&gt; &lt;span class="nf"&gt;Helper&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;IsValid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Helper&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+        &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;break&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;then the classes previously allocated to hold the captured variables &lt;code&gt;x&lt;/code&gt;
+and &lt;code&gt;c&lt;/code&gt; will instead be replaced by structs and then passed by ref to the
+synthesized function used to represent &lt;code&gt;Helper&lt;/code&gt;. This will save an extra
+class allocation for each iteration of this loop, since a new &lt;code&gt;c&lt;/code&gt; is
+captured on every iteration. This is all stack allocation, so no garbage will
+be created for the GC to collect and your program may run a bit faster.&lt;/p&gt;
+&lt;p&gt;Unfortunately, if you're thinking of using this for LINQ to avoid allocation,
+calling LINQ methods always requires passing a delegate, which will force
+allocation anyway. However, if you're looking to create helper methods and
+were afraid of using lambdas due to performance concerns, this may help
+significantly.&lt;/p&gt;
+&lt;p&gt;So, to sum up, there's no hard and fast rule when you should use a local function
+instead of a lambda, or vice versa, but if you find one of the previous
+situations applies to you, or you just like the look of local functions better,
+you might give local functions a try.&lt;/p&gt;
+&lt;div class="footnote"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id="fn-1"&gt;
+&lt;p&gt;A clever C# user may say, "what about expression trees? Local functions
+ can't be converted to expression trees!". True, but a lambda can't be
+ converted to an expression tree either&amp;mdash;expression trees are defined
+ using lambda &lt;em&gt;syntax&lt;/em&gt;, they aren't themselves lambdas.&amp;#160;&lt;a class="footnote-backref" href="#fnref-1" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id="fn-2"&gt;
+&lt;p&gt;OK, fine, here's the &lt;em&gt;Y&lt;/em&gt; combinator, go crazy:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;using System;
+public class C 
+{
+    delegate Func&amp;lt;T, T2&amp;gt; Rec&amp;lt;T, T2&amp;gt;(Rec&amp;lt;T, T2&amp;gt; f);
+
+    public static Func&amp;lt;T, T2&amp;gt; Y&amp;lt;T, T2&amp;gt;(Func&amp;lt;Func&amp;lt;T, T2&amp;gt;, Func&amp;lt;T, T2&amp;gt;&amp;gt; f)
+        =&amp;gt; new Rec&amp;lt;T, T2&amp;gt;(
+            x =&amp;gt; h =&amp;gt; f(x(x))(h))(
+            x =&amp;gt; h =&amp;gt; f(x(x))(h));
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;a class="footnote-backref" href="#fnref-2" title="Jump back to footnote 2 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id="fn-3"&gt;
+&lt;p&gt;This is because the flow of delegates isn't tracked by the compiler.
+Since delegates can be passed in and out of external functions, even external
+assemblies, there's no safe way to fully track delegates, so the compiler
+enforces all the rules at the point of delegate conversion.&amp;#160;&lt;a class="footnote-backref" href="#fnref-3" title="Jump back to footnote 3 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id="fn-4"&gt;
+&lt;p&gt;All lambdas must be converted to delegates, so you can see why this
+optimization can only be performed for local functions.&amp;#160;&lt;a class="footnote-backref" href="#fnref-4" title="Jump back to footnote 4 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</content></entry><entry><title>Stamping Git SHAs into Your Binaries</title><link href="https://commentout.net/sha-in-binary.html" rel="alternate"></link><published>2017-05-08T00:00:00-07:00</published><updated>2017-05-08T00:00:00-07:00</updated><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-08:/sha-in-binary.html</id><summary type="html">&lt;p&gt;Have you ever looked at a binary from a project you wrote and asked, "Where the hell
+are the sources for this?" Well, I'm about to make your life (and the lives of your
+customers) a bit easier. I'm going to show you how to write the Git SHA1 for …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Have you ever looked at a binary from a project you wrote and asked, "Where the hell
 are the sources for this?" Well, I'm about to make your life (and the lives of your
 customers) a bit easier. I'm going to show you how to write the Git SHA1 for each
 commit directly into the resulting binaries.&lt;/p&gt;
@@ -28,7 +252,7 @@ for .NET programs I like using the &lt;code&gt;AssemblyInformationalVersionAttri
 &lt;li&gt;Is easily accessible by .NET code via reflection.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Here's what it looks like in File Explorer with details expanded:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="File explorer screenshot" src="https://commentout.net/images/file-xplore.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="File explorer screenshot" src="https://commentout.net/images/file-xplore.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;For Unix-like systems I would probably try to use extended file attributes, although
 an exact analog is hard to come by because this is not exactly standardized across POSIX
 systems.&lt;/p&gt;
@@ -43,7 +267,7 @@ either pass the SHA through an environment variable generated by the build envir
 or to grab the SHA directly out of the Git object directory. Don't worry, I won't leave you flailing;
 here's the Roslyn MSBuild logic for finding and reading the
 Git SHA (sorry about the XML).&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;When&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;$(BUILD_SOURCEVERSION)&amp;#39; != &amp;#39;&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;When&lt;/span&gt; &lt;span class="na"&gt;Condition=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;#39;$(BUILD_SOURCEVERSION)&amp;#39; != &amp;#39;&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;lt;PropertyGroup&amp;gt;&lt;/span&gt;
     &lt;span class="nt"&gt;&amp;lt;GitHeadSha&amp;gt;&lt;/span&gt;$(BUILD_SOURCEVERSION)&lt;span class="nt"&gt;&amp;lt;/GitHeadSha&amp;gt;&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;lt;/PropertyGroup&amp;gt;&lt;/span&gt;
@@ -74,9 +298,9 @@ here. It's basically a pointer to another file, so we just read the new
 file and use the content from the second file. Afterwards, the &lt;code&gt;GitHeadSha&lt;/code&gt;
 param is passed to &lt;code&gt;&amp;lt;AssemblyInformationalVersionAttribue&amp;gt;&lt;/code&gt;, where it flows
 into the binary.&lt;/p&gt;
-&lt;p&gt;With that I'll leave you to try this yourself, and hopefully your days of playing source-code-detective are over.&lt;/p&gt;</summary></entry><entry><title>Cool Colors in WSL/Bash</title><link href="https://commentout.net/wsl-colors.html" rel="alternate"></link><updated>2017-05-03T00:00:00-07:00</updated><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-03:wsl-colors.html</id><summary type="html">&lt;p&gt;As some may know, before joining Microsoft to work on the C# compiler I was a pretty dedicated Linux user (Arch, thanks for asking) and despite finding replacements for a number of my Linux workflow standbys, I've never found a good substitute for the Unix shell. Enter the &lt;a href="https://blogs.msdn.microsoft.com/wsl/"&gt;Windows Subsystem for Linux&lt;/a&gt; AKA "Bash on Windows" AKA "GNU/NT". It's not yet my daily driver, but it's getting closer every update.&lt;/p&gt;
+&lt;p&gt;With that I'll leave you to try this yourself, and hopefully your days of playing source-code-detective are over.&lt;/p&gt;</content></entry><entry><title>Cool Colors in WSL/Bash</title><link href="https://commentout.net/wsl-colors.html" rel="alternate"></link><published>2017-05-03T00:00:00-07:00</published><updated>2017-05-03T00:00:00-07:00</updated><author><name>Andy Gocke</name></author><id>tag:commentout.net,2017-05-03:/wsl-colors.html</id><summary type="html">&lt;p&gt;As some may know, before joining Microsoft to work on the C# compiler I was a pretty dedicated Linux user (Arch, thanks for asking) and despite finding replacements for a number of my Linux workflow standbys, I've never found a good substitute for the Unix shell. Enter the &lt;a href="https://blogs.msdn.microsoft.com/wsl/"&gt;Windows Subsystem …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;As some may know, before joining Microsoft to work on the C# compiler I was a pretty dedicated Linux user (Arch, thanks for asking) and despite finding replacements for a number of my Linux workflow standbys, I've never found a good substitute for the Unix shell. Enter the &lt;a href="https://blogs.msdn.microsoft.com/wsl/"&gt;Windows Subsystem for Linux&lt;/a&gt; AKA "Bash on Windows" AKA "GNU/NT". It's not yet my daily driver, but it's getting closer every update.&lt;/p&gt;
 &lt;p&gt;One great new feature was &lt;a href="https://blogs.msdn.microsoft.com/commandline/2016/09/22/24-bit-color-in-the-windows-console/"&gt;24-bit color&lt;/a&gt;. It may seem petty, but when your entire user interface is text, every small delineation makes a huge difference in user experience. One nit is that, while it's easy for programs to output text in full color with this change, it's not easy for you, the user, to change the &lt;em&gt;color palette&lt;/em&gt;. What's the difference, you ask? A color code can be used to explicitly change the current foreground or background color to a specific shade. The color palette, however, indicates what the default color shades are. For instance, if a program says, "change the foreground color to red", but doesn't explicitly mention a shade of red, the shade of red that gets chosen is whatever red maps to in the color palette.&lt;/p&gt;
 &lt;p&gt;It practice, most terminal programs don't specify the exact color shade, but instead use on of the standard colors. There are two big benefits to that. First, you don't have to know exactly what color shades the terminal supports and, second, you don't run the risk of your chosen color shade not being visible against the other color shades in the terminal (assuming the user set their palette properly).&lt;/p&gt;
 &lt;p&gt;So WSL lets programs use a wide gamut of colors, but doesn't let them easily customize their color palette, often referred to as a theme. Luckily, Linux has a long history of theme customization, so all WSL needs is a bridge from the Linux tools to the Windows tools. Enter &lt;a href="https://github.com/agocke/xres2lnk"&gt;xres2lnk&lt;/a&gt;. This is a program I wrote to translate colors from a standard XResources file (a common format for Unix terminals) into a shortcut file. Why a shortcut file? Well, aside from the registry it's the only way to save customized colors for a console on Windows and in my experience it's much easier to save and sync between multiple computers. You can also save different color themes to different shortcuts, so you can use different color themes for different terminal sessions.&lt;/p&gt;
 &lt;p&gt;But, you say, I don't have an XResources file! Not to worry! Sites like &lt;a href="https://github.com/mbadolato/iTerm2-Color-Schemes#screenshots"&gt;https://github.com/mbadolato/iTerm2-Color-Schemes#screenshots&lt;/a&gt;, &lt;a href="https://github.com/chriskempson/base16"&gt;https://github.com/chriskempson/base16&lt;/a&gt;, and &lt;a href="http://terminal.sexy/"&gt;http://terminal.sexy/&lt;/a&gt; provide tons of themes in XResources format to download and try out. &lt;a href="http://terminal.sexy/"&gt;terminal.sexy&lt;/a&gt; even lets you customize the themes in an online color editor before exporting in XResources format.&lt;/p&gt;
-&lt;p&gt;In subsequent posts I'll detail more of my WSL customizations, but for now, if you're using WSL you have no excuses not to look good while doing it!&lt;/p&gt;</summary></entry></feed>
+&lt;p&gt;In subsequent posts I'll detail more of my WSL customizations, but for now, if you're using WSL you have no excuses not to look good while doing it!&lt;/p&gt;</content></entry></feed>

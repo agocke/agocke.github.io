@@ -24,21 +24,20 @@
 <section id="content" class="body">
     <h1 class="article-title">Lambdas and Local Functions</h1>
     <h2 class="article-subtitle"></h2>
-    <span class="article-date">2017. May. 10</span>
+    <span class="article-date">2017. Oct. 13</span>
 
     <div class="article-content">
-        <p>One of the big features that came with C# 7 was local functions, but a 
-question that's been asked by many users is, "when should I use them instead
-of a lambda?" They're both forms of functions that can be nested within other
-functions, so it's reasonable to ask what the difference between them is.
-First, it's probably useful to say when <em>can</em> you use them instead of a
-lambda. The answer is: wherever you can define a statement, you can use a
-local function instead of a lambda. Basically, if there's a pair of curly
-braces, you can use a local function instead of a lambda. The only thing that
-a lambda can do that a local function cannot is be defined in an expression
-context (like a field initializer).<sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup></p>
+        <p>Ever since local functions were added in C# 7 a common user question has
+been, "when should I use them instead of a lambda?" They're both forms of
+functions that can be nested within other functions, so it's reasonable to
+ask what the difference is. First, it's probably useful to say when <em>can</em> you
+use them instead of a lambda. The answer is: wherever you can define a
+statement, you can use a local function instead of a lambda. Basically, if
+there's a pair of curly braces, you can use a local function instead of a
+lambda. The only thing that a lambda can do that a local function cannot is
+be defined in an expression context (like a field initializer).<sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup></p>
 <p>So now that we've covered where you <em>can</em> use local functions instead of
-lambdas, that leaves the question of where you <em>should</em>? This is somewhat
+lambdas, that leaves the question of where you <em>should</em>. This is somewhat
 of a personal style question, but I can give you some situations where
 local functions can do things that lambdas can't. The most obvious of these
 is that local functions can have names, while lambdas can't. In fact,
@@ -46,7 +45,7 @@ the spec also uses the words "anonymous function" to refer to lambda methods.
 Similarly, the term "lambda" (referring to the symbol λ), is what Alonzo
 Church used to represent anonymous functions when he invented them.</p>
 <p>That means that if you're currently writing code like</p>
-<div class="highlight"><pre><span class="k">void</span> <span class="nf">Method</span><span class="p">(</span><span class="kt">string</span> <span class="n">str</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="k">void</span> <span class="nf">Method</span><span class="p">(</span><span class="kt">string</span> <span class="n">str</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">Func</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;</span> <span class="n">myFunc</span> <span class="p">=</span> <span class="n">s</span> <span class="p">=&gt;</span> <span class="kt">int</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
 
@@ -57,7 +56,7 @@ Church used to represent anonymous functions when he invented them.</p>
 
 
 <p>you should consider rewriting it into something like</p>
-<div class="highlight"><pre><span class="k">void</span> <span class="nf">Method</span><span class="p">(</span><span class="kt">string</span> <span class="n">str</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="k">void</span> <span class="nf">Method</span><span class="p">(</span><span class="kt">string</span> <span class="n">str</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="kt">int</span> <span class="nf">MyFunc</span><span class="p">(</span><span class="kt">string</span> <span class="n">s</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="kt">int</span><span class="p">.</span><span class="n">TryParse</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
 
@@ -72,7 +71,12 @@ being right next to the parameter names. In case that's not enough, here's
 a list of things that local functions can do that lambdas can't:</p>
 <ul>
 <li>
-<p>Local functions can be recursive<sup id="fnref:2"><a class="footnote-ref" href="#fn:2" rel="footnote">2</a></sup></p>
+<p>Local functions can be called without converting to a delegate, so you don't
+  need to wrap them in <code>Func</code> or <code>Action</code> if you're just calling from your
+  current method</p>
+</li>
+<li>
+<p>Local functions can be recursive<sup id="fnref-2"><a class="footnote-ref" href="#fn-2">2</a></sup></p>
 </li>
 <li>
 <p>Local functions can be iterators</p>
@@ -93,18 +97,18 @@ a list of things that local functions can do that lambdas can't:</p>
 <p>In certain cases, local functions do not need to allocate memory on the heap</p>
 </li>
 </ul>
-<p>Those last two points are pretty complicated, so let me explain in more detail.
-First, definite assignment. Definite assignment is the rule that in C#, all
-variables must be definitely be assigned before they can be used. This is the
-actual reason that lambdas cannot be recursive; the lambda is defined before
-it is assigned to the delegate, so the delegate variable cannot be used in the
-body of the lambda until it's been assigned. This is why </p>
-<div class="highlight"><pre><span class="n">Action</span> <span class="n">a</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">a</span><span class="p">();</span>
+<p>Those last two points are pretty complicated, so let me explain in more
+detail. First, definite assignment. Definite assignment is the rule that in
+C#, all variables must definitely be assigned before they can be used. This
+is the actual reason that lambdas cannot be recursive; the lambda is defined
+before it is assigned to the delegate, so the delegate variable cannot be
+used in the body of the lambda until it's been assigned. This is why</p>
+<div class="highlight"><pre><span></span><span class="n">Action</span> <span class="n">a</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">a</span><span class="p">();</span>
 </pre></div>
 
 
 <p>produces the error, <code>Use of unassigned local variable 'a'</code>, while</p>
-<div class="highlight"><pre><span class="n">Action</span> <span class="n">a</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span> 
+<div class="highlight"><pre><span></span><span class="n">Action</span> <span class="n">a</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span> 
 <span class="n">a</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">a</span><span class="p">();</span>
 </pre></div>
 
@@ -114,19 +118,19 @@ body of the lambda until it's been assigned. This is why </p>
 local function is assigned to. There's also the matter of captured variables.
 Variables captured within lambdas are required to be definitely assigned
 whenever a lambda is used. Lambdas are considered used when they are converted
-to delegates<sup id="fnref:3"><a class="footnote-ref" href="#fn:3" rel="footnote">3</a></sup>, so all captured variables must be definitely assigned at
+to delegates<sup id="fnref-3"><a class="footnote-ref" href="#fn-3">3</a></sup>, so all captured variables must be definitely assigned at
 the lambda declaration point. On the other hand, while local functions also
 require captured variables to be assigned when they're converted to delegates,
 local function declarations aren't considered usage. This allows you to do things
 like define your local functions at the end of the method, even after <code>return</code>
 statements, and the assignment rules will only be enforced at the usage point.
 For example,</p>
-<div class="highlight"><pre><span class="n">Func</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">M</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><span class="n">Func</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">M</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="kt">int</span> <span class="n">y</span><span class="p">;</span>
-    <span class="n">Func</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">eqZ</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">y</span> <span class="p">==</span> <span class="m">0</span><span class="p">;</span> <span class="c1">// Illegal, y hasn&#39;t been assigned yet</span>
+    <span class="n">Func</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">eqZ</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">y</span> <span class="p">==</span> <span class="m">0</span><span class="p">;</span> <span class="c1">// Lambda: Illegal, y hasn&#39;t been assigned yet</span>
 
-    <span class="kt">bool</span> <span class="nf">EqZ</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">y</span> <span class="p">==</span> <span class="m">0</span><span class="p">;</span> <span class="c1">// Perfectly fine, just the definition</span>
+    <span class="kt">bool</span> <span class="nf">EqZ</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">y</span> <span class="p">==</span> <span class="m">0</span><span class="p">;</span> <span class="c1">// Local Function: Perfectly fine, just the definition</span>
 
     <span class="n">y</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
     <span class="k">return</span> <span class="n">EqZ</span><span class="p">;</span> <span class="c1">// y is assigned at the delegate conversion, so it&#39;s all good</span>
@@ -137,7 +141,7 @@ For example,</p>
 <p>If you don't convert the local function to a delegate, but instead just call
 it like a method, things get even fancier. Unlike lambdas, local functions
 can also definitely assign captured variables in their enclosing method scope.</p>
-<div class="highlight"><pre><span class="kt">bool</span> <span class="nf">M</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><span class="kt">bool</span> <span class="nf">M</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="kt">int</span> <span class="n">y</span><span class="p">;</span>
     <span class="n">Local</span><span class="p">();</span>
@@ -150,35 +154,52 @@ can also definitely assign captured variables in their enclosing method scope.</
 
 <p>This is all a consequence of the fact that the compiler can "see through" calls
 to local functions in the current method. This means they can have complex
-definite assignment across calls, but it also their compilation can be more
+definite assignment across calls, but also that their compilation can be more
 advanced in general.</p>
 <p>The most notable use of the extra information is avoiding heap allocation
 when 1) the local function is not converted to a delegate and 2) none of the
 variables it captures are captured by lambdas or local functions converted to
-delegates.<sup id="fnref:4"><a class="footnote-ref" href="#fn:4" rel="footnote">4</a></sup> For example, if you take existing lambda code</p>
-<div class="highlight"><pre><span class="kt">bool</span> <span class="nf">M</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
+delegates.<sup id="fnref-4"><a class="footnote-ref" href="#fn-4">4</a></sup> For example, if you take existing lambda code</p>
+<div class="highlight"><pre><span></span><span class="kt">bool</span> <span class="nf">M</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="n">Func</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">bool</span><span class="p">&gt;</span> <span class="n">helper</span> <span class="p">=</span> <span class="n">y</span> <span class="p">=&gt;</span> <span class="n">x</span> <span class="p">==</span> <span class="n">y</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">helper</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">c</span> <span class="k">in</span> <span class="n">myCollection</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Pretend this helper does something complex</span>
+        <span class="n">Func</span><span class="p">&lt;</span><span class="kt">bool</span><span class="p">&gt;</span> <span class="n">helper</span> <span class="p">=</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">IsValid</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">helper</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
     <span class="p">...</span>
 <span class="p">}</span>
 </pre></div>
 
 
 <p>and rewrite it to</p>
-<div class="highlight"><pre><span class="kt">bool</span> <span class="nf">M</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="kt">bool</span> <span class="nf">M</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="kt">bool</span> <span class="nf">Helper</span><span class="p">(</span><span class="kt">int</span> <span class="n">y</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">x</span> <span class="p">==</span> <span class="n">y</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">Helper</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">c</span> <span class="k">in</span> <span class="n">myCollection</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">bool</span> <span class="nf">Helper</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">IsValid</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Helper</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="p">...</span>
+    <span class="p">}</span>
     <span class="p">...</span>
 <span class="p">}</span>
 </pre></div>
 
 
-<p>then the <code>class</code> previously allocated to hold the captured variable <code>x</code> will
-instead be replaced by a <code>struct</code> and then passed by <code>ref</code> to the synthesized
-function used to represent <code>Helper</code>. This is all stack allocation, so no
-garbage will be created for the GC to collect.</p>
+<p>then the classes previously allocated to hold the captured variables <code>x</code>
+and <code>c</code> will instead be replaced by structs and then passed by ref to the
+synthesized function used to represent <code>Helper</code>. This will save an extra
+class allocation for each iteration of this loop, since a new <code>c</code> is
+captured on every iteration. This is all stack allocation, so no garbage will
+be created for the GC to collect and your program may run a bit faster.</p>
 <p>Unfortunately, if you're thinking of using this for LINQ to avoid allocation,
 calling LINQ methods always requires passing a delegate, which will force
 allocation anyway. However, if you're looking to create helper methods and
@@ -189,17 +210,17 @@ instead of a lambda, or vice versa, but if you find one of the previous
 situations applies to you, or you just like the look of local functions better,
 you might give local functions a try.</p>
 <div class="footnote">
-<hr />
+<hr>
 <ol>
-<li id="fn:1">
+<li id="fn-1">
 <p>A clever C# user may say, "what about expression trees? Local functions
  can't be converted to expression trees!". True, but a lambda can't be
  converted to an expression tree either&mdash;expression trees are defined
- using lambda <em>syntax</em>, they aren't themselves lambdas.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+ using lambda <em>syntax</em>, they aren't themselves lambdas.&#160;<a class="footnote-backref" href="#fnref-1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn:2">
+<li id="fn-2">
 <p>OK, fine, here's the <em>Y</em> combinator, go crazy:</p>
-<div class="highlight"><pre>using System;
+<div class="highlight"><pre><span></span>using System;
 public class C 
 {
     delegate Func&lt;T, T2&gt; Rec&lt;T, T2&gt;(Rec&lt;T, T2&gt; f);
@@ -212,17 +233,17 @@ public class C
 </pre></div>
 
 
-<p><a class="footnote-backref" href="#fnref:2" rev="footnote" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p><a class="footnote-backref" href="#fnref-2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn:3">
+<li id="fn-3">
 <p>This is because the flow of delegates isn't tracked by the compiler.
 Since delegates can be passed in and out of external functions, even external
 assemblies, there's no safe way to fully track delegates, so the compiler
-enforces all the rules at the point of delegate conversion.&#160;<a class="footnote-backref" href="#fnref:3" rev="footnote" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+enforces all the rules at the point of delegate conversion.&#160;<a class="footnote-backref" href="#fnref-3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn:4">
+<li id="fn-4">
 <p>All lambdas must be converted to delegates, so you can see why this
-optimization can only be performed for local functions.&#160;<a class="footnote-backref" href="#fnref:4" rev="footnote" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+optimization can only be performed for local functions.&#160;<a class="footnote-backref" href="#fnref-4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>

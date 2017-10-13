@@ -63,10 +63,7 @@ main {
     width: 900px;
     color: #0C1408;
     font-size: 1.1em;
-    font-family: 'PT Serif', 'Baskerville', 'Palatino', 'Palatino Linotype', serif;
-    text-rendering: optimizeLegibility !important;
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important; 
+    font-family:'PT Serif', 'Palatino', 'Palatino Linotype', 'Palatino LT STD', 'Book Antiqua', 'Georgia', serif;
 }
 
 main #content {
@@ -75,14 +72,14 @@ main #content {
 }
 
 main code {
-    background-color: #f0f0f0;
+    background-color: #FCFCFC;
     padding-left: 0.3em;
     padding-right: 0.3em;
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     border-radius: 0.2em;
     font-family: 'Inconsolata', monospace;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #c71d47;
 }
 
@@ -93,9 +90,8 @@ main pre {
     border-style: solid;
     border-color: #cccccc;
     font-family: 'Inconsolata', monospace;
-    font-size: 0.9em;
-    width: 900px;
-    overflow-y: scroll;
+    font-size: 0.85em;
+    overflow-y: auto;
 }
 
 main .title {
