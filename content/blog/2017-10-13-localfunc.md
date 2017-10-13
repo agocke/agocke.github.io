@@ -1,20 +1,18 @@
 Title: Lambdas and Local Functions
 Slug: localfunc
-Status: draft
 
-One of the big features that came with C# 7 was local functions, but a 
-question that's been asked by many users is, "when should I use them instead
-of a lambda?" They're both forms of functions that can be nested within other
-functions, so it's reasonable to ask what the difference between them is.
-First, it's probably useful to say when *can* you use them instead of a
-lambda. The answer is: wherever you can define a statement, you can use a
-local function instead of a lambda. Basically, if there's a pair of curly
-braces, you can use a local function instead of a lambda. The only thing that
-a lambda can do that a local function cannot is be defined in an expression
-context (like a field initializer).[^1]
+Ever since local functions were added in C# 7 a common user question has
+been, "when should I use them instead of a lambda?" They're both forms of
+functions that can be nested within other functions, so it's reasonable to
+ask what the difference is. First, it's probably useful to say when *can* you
+use them instead of a lambda. The answer is: wherever you can define a
+statement, you can use a local function instead of a lambda. Basically, if
+there's a pair of curly braces, you can use a local function instead of a
+lambda. The only thing that a lambda can do that a local function cannot is
+be defined in an expression context (like a field initializer).[^1]
 
 So now that we've covered where you *can* use local functions instead of
-lambdas, that leaves the question of where you *should*? This is somewhat
+lambdas, that leaves the question of where you *should*. This is somewhat
 of a personal style question, but I can give you some situations where
 local functions can do things that lambdas can't. The most obvious of these
 is that local functions can have names, while lambdas can't. In fact,
@@ -50,6 +48,10 @@ If nothing else, you might find this more readable due to the parameter types
 being right next to the parameter names. In case that's not enough, here's
 a list of things that local functions can do that lambdas can't:
 
+* Local functions can be called without converting to a delegate, so you don't
+  need to wrap them in `Func` or `Action` if you're just calling from your
+  current method
+
 * Local functions can be recursive[^2]
 
 * Local functions can be iterators
@@ -65,20 +67,24 @@ a list of things that local functions can do that lambdas can't:
 * In certain cases, local functions do not need to allocate memory on the heap
 
 
-Those last two points are pretty complicated, so let me explain in more detail.
-First, definite assignment. Definite assignment is the rule that in C#, all
-variables must be definitely be assigned before they can be used. This is the
-actual reason that lambdas cannot be recursive; the lambda is defined before
-it is assigned to the delegate, so the delegate variable cannot be used in the
-body of the lambda until it's been assigned. This is why 
+Those last two points are pretty complicated, so let me explain in more
+detail. First, definite assignment. Definite assignment is the rule that in
+C#, all variables must definitely be assigned before they can be used. This
+is the actual reason that lambdas cannot be recursive; the lambda is defined
+before it is assigned to the delegate, so the delegate variable cannot be
+used in the body of the lambda until it's been assigned. This is why
+
 ```csharp
 Action a = () => a();
 ```
+
 produces the error, `Use of unassigned local variable 'a'`, while
+
 ```csharp
 Action a = null; 
 a = () => a();
 ```
+
 compiles without issue.
 
 However, there's more to just definite assignment then just the variable the
@@ -97,9 +103,9 @@ For example,
 Func<bool> M()
 {
     int y;
-    Func<bool> eqZ = () => y == 0; // Illegal, y hasn't been assigned yet
+    Func<bool> eqZ = () => y == 0; // Lambda: Illegal, y hasn't been assigned yet
 
-    bool EqZ() => y == 0; // Perfectly fine, just the definition
+    bool EqZ() => y == 0; // Local Function: Perfectly fine, just the definition
 
     y = 0;
     return EqZ; // y is assigned at the delegate conversion, so it's all good
@@ -123,7 +129,7 @@ bool M()
 
 This is all a consequence of the fact that the compiler can "see through" calls
 to local functions in the current method. This means they can have complex
-definite assignment across calls, but it also their compilation can be more
+definite assignment across calls, but also that their compilation can be more
 advanced in general.
 
 The most notable use of the extra information is avoiding heap allocation
@@ -134,8 +140,16 @@ delegates.[^4] For example, if you take existing lambda code
 ```csharp
 bool M(int x)
 {
-    Func<int, bool> helper = y => x == y;
-    if (helper(0))
+    foreach (var c in myCollection)
+    {
+        // Pretend this helper does something complex
+        Func<bool> helper = () => IsValid(c, x);
+        if (helper())
+        {
+            break;
+        }
+        ...
+    }
     ...
 }
 ```
@@ -145,16 +159,25 @@ and rewrite it to
 ```csharp
 bool M(int x)
 {
-    bool Helper(int y) => x == y;
-    if (Helper(0))
+    foreach (var c in myCollection)
+    {
+        bool Helper() => IsValid(c, x);
+        if (Helper())
+        {
+            break;
+        }
+        ...
+    }
     ...
 }
 ```
 
-then the `class` previously allocated to hold the captured variable `x` will
-instead be replaced by a `struct` and then passed by `ref` to the synthesized
-function used to represent `Helper`. This is all stack allocation, so no
-garbage will be created for the GC to collect.
+then the classes previously allocated to hold the captured variables `x`
+and `c` will instead be replaced by structs and then passed by ref to the
+synthesized function used to represent `Helper`. This will save an extra
+class allocation for each iteration of this loop, since a new `c` is
+captured on every iteration. This is all stack allocation, so no garbage will
+be created for the GC to collect and your program may run a bit faster.
 
 Unfortunately, if you're thinking of using this for LINQ to avoid allocation,
 calling LINQ methods always requires passing a delegate, which will force
