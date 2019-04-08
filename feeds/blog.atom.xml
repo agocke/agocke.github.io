@@ -17,7 +17,7 @@ point it out.&lt;/p&gt;
 in the C# language: covariant arrays. Everyone I know of in the language and the development
 teams who has an opinion on the feature thinks it's bad.&lt;/p&gt;
 &lt;p&gt;For those unfamiliar, the feature is simple: in C# an array of type &lt;code&gt;T[]&lt;/code&gt; can be converted to an
-array of type &lt;code&gt;U[]&lt;/code&gt; if &lt;code&gt;U&lt;/code&gt; is a subtype of &lt;code&gt;T&lt;/code&gt;. For instance, an array of &lt;code&gt;string[]&lt;/code&gt; can be
+array of type &lt;code&gt;U[]&lt;/code&gt; if &lt;code&gt;T&lt;/code&gt; is a subtype of &lt;code&gt;U&lt;/code&gt;. For instance, an array of &lt;code&gt;string[]&lt;/code&gt; can be
 converted to an array of type &lt;code&gt;object[]&lt;/code&gt; without copying the array. As far as I know, there are
 two reasons the feature was put into C#. The first is simple; Java has it. C# was meant to be
 familiar to Java users and reasonably compatible with its source code. The second reason is
