@@ -12,7 +12,7 @@
             <header>
             </header>
             <nav>
-                <a href="https://commentout.net"><div id="home"># comment out</div></a>
+                <a href="https://www.commentout.com"><div id="home"># comment out</div></a>
                 <ul>
                     <a href="/pages/about-me.html"><li>About</li></a>
                 </ul>
@@ -31,7 +31,7 @@ use them instead of a lambda. The answer is: wherever you can define a
 statement, you can use a local function instead of a lambda. Basically, if
 there's a pair of curly braces, you can use a local function instead of a
 lambda. The only thing that a lambda can do that a local function cannot is
-be defined in an expression context (like a field initializer).<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+be defined in an expression context (like a field initializer).<sup id="fnref-1"><a class="footnote-ref" href="#fn-1">1</a></sup></p>
 <p>So now that we've covered where you <em>can</em> use local functions instead of
 lambdas, that leaves the question of where you <em>should</em>. This is somewhat
 of a personal style question, but I can give you some situations where
@@ -72,7 +72,7 @@ a list of things that local functions can do that lambdas can't:</p>
   current method</p>
 </li>
 <li>
-<p>Local functions can be recursive<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></p>
+<p>Local functions can be recursive<sup id="fnref-2"><a class="footnote-ref" href="#fn-2">2</a></sup></p>
 </li>
 <li>
 <p>Local functions can be iterators</p>
@@ -114,7 +114,7 @@ used in the body of the lambda until it's been assigned. This is why</p>
 local function is assigned to. There's also the matter of captured variables.
 Variables captured within lambdas are required to be definitely assigned
 whenever a lambda is used. Lambdas are considered used when they are converted
-to delegates<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup>, so all captured variables must be definitely assigned at
+to delegates<sup id="fnref-3"><a class="footnote-ref" href="#fn-3">3</a></sup>, so all captured variables must be definitely assigned at
 the lambda declaration point. On the other hand, while local functions also
 require captured variables to be assigned when they're converted to delegates,
 local function declarations aren't considered usage. This allows you to do things
@@ -155,7 +155,7 @@ advanced in general.</p>
 <p>The most notable use of the extra information is avoiding heap allocation
 when 1) the local function is not converted to a delegate and 2) none of the
 variables it captures are captured by lambdas or local functions converted to
-delegates.<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> For example, if you take existing lambda code</p>
+delegates.<sup id="fnref-4"><a class="footnote-ref" href="#fn-4">4</a></sup> For example, if you take existing lambda code</p>
 <div class="highlight"><pre><span></span><span class="kt">bool</span> <span class="nf">M</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">c</span> <span class="k">in</span> <span class="n">myCollection</span><span class="p">)</span>
@@ -208,13 +208,13 @@ you might give local functions a try.</p>
 <div class="footnote">
 <hr>
 <ol>
-<li id="fn:1">
+<li id="fn-1">
 <p>A clever C# user may say, "what about expression trees? Local functions
  can't be converted to expression trees!". True, but a lambda can't be
  converted to an expression tree either&mdash;expression trees are defined
- using lambda <em>syntax</em>, they aren't themselves lambdas.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+ using lambda <em>syntax</em>, they aren't themselves lambdas.&#160;<a class="footnote-backref" href="#fnref-1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn:2">
+<li id="fn-2">
 <p>OK, fine, here's the <em>Y</em> combinator, go crazy:</p>
 <div class="highlight"><pre><span></span>using System;
 public class C 
@@ -229,17 +229,17 @@ public class C
 </pre></div>
 
 
-<p><a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p><a class="footnote-backref" href="#fnref-2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
-<li id="fn:3">
+<li id="fn-3">
 <p>This is because the flow of delegates isn't tracked by the compiler.
 Since delegates can be passed in and out of external functions, even external
 assemblies, there's no safe way to fully track delegates, so the compiler
-enforces all the rules at the point of delegate conversion.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+enforces all the rules at the point of delegate conversion.&#160;<a class="footnote-backref" href="#fnref-3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn:4">
+<li id="fn-4">
 <p>All lambdas must be converted to delegates, so you can see why this
-optimization can only be performed for local functions.&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+optimization can only be performed for local functions.&#160;<a class="footnote-backref" href="#fnref-4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
