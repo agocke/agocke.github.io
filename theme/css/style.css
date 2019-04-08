@@ -4,11 +4,6 @@ body {
     background-color: #FDFDFD;
 }
 
-a {
-    color: inherit;
-    text-decoration: inherit;
-}
-
 #box {
     background-color: #ffffff;
     width: 1000px;
@@ -58,17 +53,23 @@ nav li {
 
 main {
     display: block;
+    overflow: auto;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     width: 900px;
     color: #0C1408;
     font-size: 1.1em;
     font-family:'PT Serif', 'Palatino', 'Palatino Linotype', 'Palatino LT STD', 'Book Antiqua', 'Georgia', serif;
 }
 
-main #content {
-    margin-top: 20px;
-    display: inline-block;
+main a {
+    color: #2a7ae2;
+    text-decoration: none;
+}
+
+.page-heading {
+    font-size: 1.1em;
 }
 
 main code {
@@ -84,14 +85,14 @@ main code {
 }
 
 main pre {
-    background-color: #ffffff;
+    background-color: #FCFCFC;
     padding: 10px 20px;
     border-width: 0.1em;
     border-style: solid;
     border-color: #cccccc;
     font-family: 'Inconsolata', monospace;
     font-size: 0.85em;
-    overflow-y: auto;
+    overflow-x: scroll;
 }
 
 main .title {
@@ -136,6 +137,23 @@ main .article-content h2 {
 main .article-content .footnote {
     margin-top: 200px;
     font-size: 0.9em;
+}
+
+.post-list {
+    margin-left: 0px;
+    list-style: none;
+    padding: 0px;
+}
+
+.post-list a {
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.post-list .post-date {
+    font-size: 0.8em;
+    font-style: italic;
+    color: #999;
 }
 
 footer {
