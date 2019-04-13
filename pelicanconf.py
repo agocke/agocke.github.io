@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Andy Gocke'
 SITENAME = u'comment out'
-SITEURL = u'localhost:8000'
+SITEURL = u'http://localhost:8000'
 
 TIMEZONE = 'America/Los_Angeles'
 

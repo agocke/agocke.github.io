@@ -3,7 +3,12 @@
 {% block title %}commentout.com{% endblock %}
 
 {% block content %}
-<h1 class="page-heading">Posts</h1>
+<div class="page-heading">
+    <h1>Posts</h1>
+    <a href="{{ FEED_ALL_ATOM_URL }}" style="display: inline;">
+        <img class="transparent" src="{{ SITEURL }}/images/feed.png" alt="Atom feed link" width="16" height="16"></img>
+    </a>
+</div>
 
 <ul class="post-list">
     {% for post in dates %}

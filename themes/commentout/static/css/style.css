@@ -68,8 +68,10 @@ main a {
     text-decoration: none;
 }
 
-.page-heading {
+.page-heading h1 {
     font-size: 1.1em;
+    display: inline;
+    margin-right: 10px;
 }
 
 main code {
