@@ -8,7 +8,7 @@
 <ul class="post-list">
     {% for post in dates %}
     <li>
-        <a href="{{ SITURL }}/{{ post.url }}">
+        <a href="{{ post.url }}">
             <h3>{{ post.title }}</h3>
         </a>
         <span class="post-date">{{ post.locale_date }}</span>
