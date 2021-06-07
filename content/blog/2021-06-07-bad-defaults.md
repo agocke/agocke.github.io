@@ -31,10 +31,10 @@ warning if one is provided. As you can see, `null` is actually just a particular
 case of the the `default()` problem. Yes, I consider `default()` to be an even bigger problem
 than `null`.
 
-It's not just reference types that have the same problem, either. Consider `ImmutableArray&lt;T&rt;`;
-this type contains a single reference to an array, and for performance reasons it does not check
-if the array is null before accessing an element. Of course, if the `ImmutableArray` is created by
-using one of the standard creation functions, it's not possible for the internal array to be null.
-If you use `default()`, however, the access function will throw, just like a reference type.
+It's not just reference types that have the same problem, either. Consider `ImmutableArray<T>`; this
+type contains a single reference to an array. Of course, if the `ImmutableArray` is created by using
+one of the standard creation functions, it's not possible for the internal array to be null.  If you
+use `default()`, however, the array field will be null and the access function will throw, just like
+a reference type.
 
 [^1]: Which are value types, but special ones.
