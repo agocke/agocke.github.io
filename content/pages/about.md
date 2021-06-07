@@ -1,4 +1,5 @@
 Title: About Me
 
-[https://github.com/agocke](https://github.com/agocke)
-[https://twitter.com/andygocke](https://twitter.com/andygocke)
+Github: [https://github.com/agocke](https://github.com/agocke)
+
+Twitter: [https://twitter.com/andygocke](https://twitter.com/andygocke)
