@@ -1,8 +1,8 @@
-Title: Bad `default()`s
+Title: Bad default()s
 Slug: bad-defaults
 Status: draft
 
-I previously wrote about [covariant arrays]({filename}/2019-04-08-ragrets.md), which is a widely
+I previously wrote about [covariant arrays]({filename}/blog/2019-04-08-ragrets.md), which is a widely
 regretted feature among the C# design team. This time I'd like to talk about my personal biggest
 regret, `default(T)`.
 
@@ -37,4 +37,4 @@ if the array is null before accessing an element. Of course, if the `ImmutableAr
 using one of the standard creation functions, it's not possible for the internal array to be null.
 If you use `default()`, however, the access function will throw, just like a reference type.
 
-[^1] Which are value types, but special ones.
+[^1]: Which are value types, but special ones.

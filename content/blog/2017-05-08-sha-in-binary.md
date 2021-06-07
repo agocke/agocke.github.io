@@ -33,7 +33,7 @@ for .NET programs I like using the `AssemblyInformationalVersionAttribute`. This
 
 Here's what it looks like in File Explorer with details expanded:
 
-![File explorer screenshot]({filename}/images/file-xplore.jpg)
+![File explorer screenshot]({static}/images/file-xplore.jpg)
 
 For Unix-like systems I would probably try to use extended file attributes, although
 an exact analog is hard to come by because this is not exactly standardized across POSIX

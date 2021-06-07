@@ -21,7 +21,7 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 STATIC_PATHS = [ 'extras/CNAME', 'extras/favicon.ico', 'images' ]
-EXTRA_PATH_METADATA = { 
+EXTRA_PATH_METADATA = {
     'extras/CNAME': { 'path': 'CNAME' },
     'extras/favicon.ico': {'path': 'favicon.ico'}
 }
