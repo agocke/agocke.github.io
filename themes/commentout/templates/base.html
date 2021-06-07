@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="utf-8" />
         {% block head %}
         <title>{% block title %}{% endblock title %}</title>
-        <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="/theme/css/style.css" />
         <link rel="stylesheet" type="text/css" href="/theme/css/pygment.css" />
-        <link href="https://fonts.googleapis.com/css?family=Inconsolata|PT+Sans|PT+Serif" rel="stylesheet">
         {% if FEED_ALL_ATOM %}
         <link href="{{ FEED_DOMAIN }}/{% if FEED_ALL_ATOM_URL %}{{ FEED_ALL_ATOM_URL }}{% else %}{{ FEED_ALL_ATOM }}{% endif %}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Full Atom Feed" />
         {% endif %}
@@ -23,7 +22,7 @@
             <nav>
                 <a href="{{ SITEURL }}"><div id="home"># comment out</div></a>
                 <ul>
-                    <a href="{{filename}}/pages/about-me.html"><li>About</li></a>
+                    <li><a href="{{filename}}/pages/about-me.html">About</a></li>
                 </ul>
             </nav>
             <main>

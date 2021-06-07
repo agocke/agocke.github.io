@@ -1,7 +1,17 @@
+:root {
+    --sans-serif-face: "Segoe UI", "Calibri", Helvetica, Arial, sans-serif;
+    --monospace-face: 'Consolas', 'Monaco', monospace;
+    --serif-face: 'Palatino', 'Palatino Linotype', 'Palatino LT STD', 'Book Antiqua', 'Georgia', serif;
+}
 body {
     margin: 0px;
     padding: 0px;
     background-color: #FDFDFD;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
 }
 
 #box {
@@ -20,10 +30,11 @@ nav {
     border-top-width: 1px;
     border-bottom-style: solid;
     border-bottom-width: 1px;
+    color: #33444E;
 }
 
 nav #home {
-    font-family: 'Inconsolata', monospace;
+    font-family: var(--monospace-face);
     font-size: 1.2em;
     font-style: italic;
     line-height: 40px;
@@ -38,12 +49,11 @@ nav ul {
     margin: 0px;
     height: 40px;
     float: right;
-    color: #33444E;
+    font-family: var(--sans-serif-face);
     font-style: italic;
 }
 
 nav li {
-    font-family: 'Raleway', sans-serif;
     display: inline-block;
     margin-right: 20px;
     line-height: 40px;
@@ -60,7 +70,7 @@ main {
     width: 900px;
     color: #0C1408;
     font-size: 1.1em;
-    font-family:'PT Serif', 'Palatino', 'Palatino Linotype', 'Palatino LT STD', 'Book Antiqua', 'Georgia', serif;
+    font-family: var(--sans-serif-face);
 }
 
 main a {
@@ -81,33 +91,32 @@ main code {
     padding-top: 0.2em;
     padding-bottom: 0.2em;
     border-radius: 0.2em;
-    font-family: 'Inconsolata', monospace;
+    font-family: var(--monospace-face);
     font-size: 0.85em;
     color: #c71d47;
 }
 
-main pre {
+main .highlight pre {
     background-color: #FCFCFC;
     padding: 10px 20px;
     border-width: 0.1em;
     border-style: solid;
     border-color: #cccccc;
-    font-family: 'Inconsolata', monospace;
+    font-family: var(--monospace-face);
     font-size: 0.85em;
-    overflow-x: scroll;
+    overflow: auto;
 }
 
-main .title {
+main .article-title {
     font-size: 2em;
     font-weight: normal;
     clear: both;
-    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+    font-family: var(--serif-face);
     margin-bottom: 0px;
 }
 
 main .article-subtitle {
     margin-top: 0px;
-    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
     font-style: italic;
     font-weight: normal;
     font-size: 1.2em;
@@ -115,7 +124,6 @@ main .article-subtitle {
 }
 
 main .article-date {
-    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
     color: #999;
 }
 
@@ -133,7 +141,6 @@ main .article-content a:hover {
 
 main .article-content h2 {
     font-weight: normal;
-    font-family: 'PT Sans', Helvetica, Arial, sans-serif;
 }
 
 main .article-content .footnote {
