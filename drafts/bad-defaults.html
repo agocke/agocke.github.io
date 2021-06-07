@@ -30,7 +30,7 @@ regret, <code>default(T)</code>.</p>
 <p>First, a brief description of the feature for those not familiar. In C# (and .NET in general), all
 types are required to have a default or "zero" value. For reference types (classes) this value is
 <code>null</code>. For value types (structs), this is a value where all of the fields of the struct are the
-default value. For the primitive types[^1] (int, double, et al.), the default value is 0 (hence
+default value. For the primitive types<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> (int, double, et al.), the default value is 0 (hence
 "zero value"). In C# <code>default()</code> is an expression legal in all expression contexts which evaluates
 to the default value of the type provided between the parenthesis.</p>
 <p>There are two reasons why I dislike the feature. The first is fairly simple: it requires a
@@ -54,7 +54,14 @@ this type contains a single reference to an array, and for performance reasons i
 if the array is null before accessing an element. Of course, if the <code>ImmutableArray</code> is created by
 using one of the standard creation functions, it's not possible for the internal array to be null.
 If you use <code>default()</code>, however, the access function will throw, just like a reference type.</p>
-<p>[^1] Which are value types, but special ones.</p>
+<div class="footnote">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Which are value types, but special ones.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 </div>
             </main>
             <footer>
