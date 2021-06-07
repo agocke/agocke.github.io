@@ -49,11 +49,11 @@ non-null reference types do not have a default value, and indeed <code>default()
 warning if one is provided. As you can see, <code>null</code> is actually just a particularly annoying
 case of the the <code>default()</code> problem. Yes, I consider <code>default()</code> to be an even bigger problem
 than <code>null</code>.</p>
-<p>It's not just reference types that have the same problem, either. Consider <code>ImmutableArray&amp;lt;T&amp;rt;</code>;
-this type contains a single reference to an array, and for performance reasons it does not check
-if the array is null before accessing an element. Of course, if the <code>ImmutableArray</code> is created by
-using one of the standard creation functions, it's not possible for the internal array to be null.
-If you use <code>default()</code>, however, the access function will throw, just like a reference type.</p>
+<p>It's not just reference types that have the same problem, either. Consider <code>ImmutableArray&lt;T&gt;</code>; this
+type contains a single reference to an array. Of course, if the <code>ImmutableArray</code> is created by using
+one of the standard creation functions, it's not possible for the internal array to be null.  If you
+use <code>default()</code>, however, the array field will be null and the access function will throw, just like
+a reference type.</p>
 <div class="footnote">
 <hr>
 <ol>
