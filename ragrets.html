@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>RAGRETS.MD | commentout.net</title>
+        <link rel="stylesheet" type="text/css" href="/theme/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="/theme/css/pygment.css" />
+        <link href="https://www.commentout.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="comment out Full Atom Feed" />
+        <link href="https://www.commentout.com/feeds/blog.atom.xml" type="application/atom+xml" rel="alternate" title="comment out Categories Atom Feed" />
+    </head>
+    <body>
+        <div id="box">
+            <header>
+            </header>
+            <nav>
+                <a href="https://www.commentout.com"><div id="home"># comment out</div></a>
+                <ul>
+                    <li><a href="/pages/about-me.html">About</a></li>
+                </ul>
+            </nav>
+            <main>
+<h1 class="article-title">RAGRETS.MD</h1>
+<h2 class="article-subtitle"></h2>
+<span class="article-date">2019. Apr. 08</span>
+
+<div class="article-content">
+    <p>A while back Swift developer Joe Groff <a href="https://twitter.com/jckarter/status/1084993677561196545">tweeted a
+proposal</a> that projects have a
+REGRETS.MD file describing "regretful design choices that can't be reversed for time,
+compatibility, etc. reasons." This seems like a good idea, both to help developers who are
+trodding similar ground, and also for me to vent some frustration with being unable to rewind
+time.</p>
+<p>To that end, I'm starting a blog series, RAGRETS.MD, where I will list some of the design
+decisions I regret about C#. For the most part these are my personal regrets, but in cases where
+I know the feeling is shared widely among the language or development teams I'll do my best to
+point it out.</p>
+<p>To christen the series I might as well start with one of the most universally reviled "features"
+in the C# language: covariant arrays. Everyone I know of in the language and the development
+teams who has an opinion on the feature thinks it's bad.</p>
+<p>For those unfamiliar, the feature is simple: in C# an array of type <code>T[]</code> can be converted to an
+array of type <code>U[]</code> if <code>T</code> is a subtype of <code>U</code>. For instance, an array of <code>string[]</code> can be
+converted to an array of type <code>object[]</code> without copying the array. As far as I know, there are
+two reasons the feature was put into C#. The first is simple; Java has it. C# was meant to be
+familiar to Java users and reasonably compatible with its source code. The second reason is
+probably the reason why Java has it: it's quite useful if your language doesn't have generics.</p>
+<p>Consider how you would write a simple helper method to print an array of objects without
+generics. It would probably look something like:</p>
+<div class="highlight"><pre><span></span><span class="k">void</span> <span class="nf">PrintAll</span><span class="p">(</span><span class="kt">object</span><span class="p">[]</span> <span class="n">objects</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">o</span> <span class="k">in</span> <span class="n">objects</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">ToString</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>This seems like a very useful method, but what if you want to use it to print a list of strings? If
+there's a conversion from <code>string[]</code> to <code>object[]</code>, no problem. But if there isn't you have to copy
+the whole list. It's pretty easy to see why covariant arrays are attractive.</p>
+<p>So what's the problem? Well, the first problem is that it's completely type-unsafe given that arrays
+are mutable. Consider the following example:</p>
+<div class="highlight"><pre><span></span><span class="kt">string</span><span class="p">[]</span> <span class="n">s</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span> <span class="p">{</span> <span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="s">&quot;c&quot;</span> <span class="p">};</span>
+<span class="kt">object</span><span class="p">[]</span> <span class="n">o</span> <span class="p">=</span> <span class="n">s</span><span class="p">;</span>
+<span class="n">o</span><span class="p">[</span><span class="m">0</span><span class="p">]</span> <span class="p">=</span> <span class="m">5</span><span class="p">;</span>
+</pre></div>
+
+<p>This should fail at compile time -- you're putting an integer into a string array! Indeed, if you
+replace <code>o[0]</code> with <code>s[0]</code> on the last line, you'll get a compile time error saying this is
+illegal. But covariant arrays violate compile-time type safety. Of course, C# is supposed to be a
+memory safe language, so it doesn't just do nothing about this. Instead it adds a <em>runtime</em> check
+to every write of an array, <em>just in case</em> there's a type safety violation, at which point an
+exception is thrown.</p>
+<p>The second problem is that array covariance is just not that useful if you have interfaces and
+generics that understand variance. Later versions of C# added generics and variance to interfaces
+like <code>IEnumerable&lt;T&gt;</code>, which is a simple, type safe approach to writing the <code>PrintAll</code> method
+above. The key is that <code>IEnumerable&lt;T&gt;</code> doesn't allow modification of the elements of the array,
+so you can never alter the array after the conversion.</p>
+<p>So the sum of the situation is: any array write could potentially throw an exception and all
+array accesses suffer a performance hit, just for a feature that almost no one uses and has
+clearly better alternatives.</p>
+<p>Regrets.</p>
+</div>
+            </main>
+            <footer>
+            </footer>
+        </div>
+    </body>
+</html>
